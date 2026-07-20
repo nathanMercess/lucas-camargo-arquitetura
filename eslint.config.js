@@ -16,6 +16,7 @@ module.exports = defineConfig([
     processor: angular.processInlineTemplates,
     rules: {
       eqeqeq: ['error', 'always'],
+      'nonblock-statement-body-position': ['error', 'below'],
       '@angular-eslint/prefer-on-push-component-change-detection': 'error',
       '@angular-eslint/prefer-standalone': 'off',
       '@angular-eslint/directive-selector': [

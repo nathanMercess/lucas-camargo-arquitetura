@@ -2,7 +2,21 @@
 
 Fundação técnica do novo site institucional e portfólio de Lucas Camargo. O produto será uma experiência minimalista, centrada em imagens, com conteúdo administrável e identidade visual fiel ao brand kit.
 
-> Status: etapa 1 concluída - projeto Angular, padrões técnicos e escopo inicial documentados.
+> Status: etapa 2 em andamento - fundação técnica concluída e primeira versão responsiva da Home implementada.
+
+## Implementação atual
+
+- Home full-screen com navegação responsiva, atuação, portfólio, indicadores, perfil, contato e footer.
+- Conteúdo inicial centralizado em `PublicSiteContentService` com signals, preparado para substituição por API ou CMS.
+- Portfólio com acordeão horizontal acessível, inspirado na referência da página 3 do `SITE.pdf`:
+  - uma categoria expandida por vez;
+  - seleção por hover, foco ou clique;
+  - alternância automática a cada seis segundos;
+  - controle explícito para pausar e retomar;
+  - animação desativada quando `prefers-reduced-motion` estiver ativo;
+  - adaptação vertical para telas menores.
+- Logo primário e monocromático claro extraídos do brand kit fornecido, preservando proporção e composição aprovadas.
+- Áreas de imagem usam composições abstratas temporárias. Fotos reais de projetos, obras e perfil ainda precisam ser fornecidas e não devem ser substituídas por trabalhos fictícios.
 
 ## Visão do produto
 
@@ -95,12 +109,13 @@ Esses valores devem ser tratados como conteúdo inicial editável, não como con
 - Angular 21 LTS com NgModules.
 - TypeScript em modo estrito.
 - Angular Router.
+- PrimeNG 21, carregando somente os módulos utilizados e em modo `unstyled` para preservar o brand kit.
 - SCSS.
 - Signals e `computed` para estado reativo e derivações.
 - Vitest para testes unitários.
 - ESLint para análise estática.
-- Prettier e EditorConfig para formatação.
-- pnpm 11.
+- EditorConfig e ESLint para padronização e análise estática.
+- Yarn Classic 1.22.22.
 
 O Angular 21 foi escolhido por estar em suporte e ser compatível com o runtime disponível. A migração para uma versão principal mais nova deve seguir a matriz oficial de compatibilidade entre Angular, Node.js e TypeScript.
 
@@ -108,11 +123,13 @@ O Angular 21 foi escolhido por estar em suporte e ser compatível com o runtime 
 
 ```text
 src/app/
-|-- app.component.*
+|-- app/
+|   `-- app.component.*   # shell raiz da aplicação e do roteamento
 |-- app.module.ts
 |-- app-routing.module.ts
 |-- core/                 # infraestrutura global e integrações
-|-- shared/               # componentes e utilitários realmente reutilizáveis
+|-- shared/
+|   `-- models/           # contratos compartilhados pelo site público e pelo painel
 `-- features/
     |-- public-site/      # experiência pública e composição das seções
     |-- portfolio/        # categorias, álbuns, galeria e lightbox
@@ -121,9 +138,16 @@ src/app/
 
 Cada feature deve manter o componente raiz, módulo e serviço de orquestração no primeiro nível. Domínios especializados ficam em `components/<domain>`, com seus próprios `models`, `services` e `base` quando houver reutilização real.
 
-## Regras de desenvolvimento
+## Regras obrigatórias de desenvolvimento
+
+O guia [BOAS-PRATICAS.md](./BOAS-PRATICAS.md) está versionado na raiz e é a fonte de verdade obrigatória para qualquer implementação ou revisão. O `AGENTS.md` exige sua leitura antes de alterações futuras.
+
+Resumo dos critérios de aceite:
 
 - Arquivos e pastas em `kebab-case`.
+- Cada interface, type, enum ou classe de modelo deve ficar em seu próprio arquivo; é proibido agrupar múltiplas declarações de domínio no mesmo arquivo.
+- Models compartilhados entre o site público e o painel administrativo devem ficar em `src/app/shared/models`.
+- Não criar arquivos agregadores (`barrel files`) sem uma necessidade comprovada de API pública.
 - Componentes com sufixo `.component`, template e SCSS externos e `ChangeDetectionStrategy.OnPush`.
 - Novos inputs e outputs com `input`, `model` e `output` quando aplicável.
 - Estado compartilhado e comunicação HTTP em services; componentes cuidam de apresentação e interação.
@@ -134,7 +158,15 @@ Cada feature deve manter o componente raiz, módulo e serviço de orquestração
 - Templates com `@if`, `@for` com `track` estável e `@switch`.
 - Todo texto visível e estático marcado com `i18n`.
 - Classes-base somente quando houver comportamento realmente repetido.
-- Modelos locais permanecem dentro do domínio proprietário até existir reutilização real.
+- Models exclusivos de uma única feature permanecem dentro do domínio proprietário.
+- Templates e TypeScript seguem a indentação padrão Visual Studio documentada no guia; o fechamento da abertura de uma tag nunca fica isolado em outra linha.
+- O corpo de um `if` com uma única instrução fica obrigatoriamente na linha seguinte, sem chaves e com mais 2 espaços de indentação.
+- Antes de criar um controle de interface, consultar a documentação oficial do PrimeNG e verificar se existe um componente compatível.
+- Quando o PrimeNG atender aos requisitos funcionais, visuais e de acessibilidade, seu uso é obrigatório; uma implementação própria exige uma limitação objetiva e documentada.
+- Importar somente o módulo específico do PrimeNG consumido pela feature; não criar um módulo global com toda a biblioteca.
+- Preservar a identidade visual com PrimeNG em modo `unstyled` ou por tokens do tema, sem aceitar estilos padrão que contrariem o brand kit.
+- Não manter código morto, exports sem consumidor, dependências sem uso, pastas vazias preventivas ou configurações de ferramentas incompatíveis com a stack atual.
+- Criar abstrações, pastas e dependências somente quando houver uso real no escopo implementado.
 - Testes para services, regras derivadas, componentes interativos e fluxos de modal.
 
 ## Como executar
@@ -142,23 +174,22 @@ Cada feature deve manter o componente raiz, módulo e serviço de orquestração
 ### Pré-requisitos
 
 - Node.js compatível com Angular 21: `^20.19.0`, `^22.12.0` ou `^24.0.0`.
-- pnpm 11.
+- Yarn Classic 1.22.22.
 
 ### Comandos
 
 ```bash
-pnpm install
-pnpm start
+yarn install
+yarn start
 ```
 
 O servidor local fica disponível por padrão em `http://localhost:4200`.
 
 ```bash
-pnpm lint
-pnpm format:check
-pnpm test
-pnpm build
-pnpm check
+yarn lint
+yarn test
+yarn build
+yarn run check
 ```
 
 ## Modelo de conteúdo preliminar
@@ -195,9 +226,9 @@ A relação entre álbuns e categorias é muitos-para-muitos, pois um mesmo álb
 
 ### 2. Sistema visual e estrutura pública
 
-- Implementar grid, tipografia, espaçamento, breakpoints e componentes básicos.
-- Construir header, navegação, seções full-screen e footer.
-- Validar responsividade, teclado, contraste e movimento reduzido.
+- [Em andamento] Implementar grid, tipografia, espaçamento, breakpoints e componentes básicos.
+- [Concluído na primeira versão] Construir header, navegação, seções full-screen e footer.
+- [Em andamento] Validar responsividade, teclado, contraste e movimento reduzido.
 
 ### 3. Portfólio
 

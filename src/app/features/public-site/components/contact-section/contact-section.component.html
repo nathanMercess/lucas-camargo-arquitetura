@@ -1,0 +1,22 @@
+<section id="contato" class="contact-section" aria-labelledby="contact-title">
+  <div class="contact-section-introduction">
+    <p class="contact-section-overline" i18n>Contato</p>
+    <h2 id="contact-title" i18n>Vamos conversar sobre o seu projeto?</h2>
+    <p i18n>Conte seus objetivos e dê o primeiro passo para transformar seu espaço.</p>
+  </div>
+
+  <dl class="contact-section-list">
+    @for (channel of contactChannels(); track channel.id) {
+      <div class="contact-section-item">
+        <dt>{{ channel.label }}</dt>
+        <dd>
+          @if (channel.href) {
+            <a [href]="channel.href">{{ channel.value }}</a>
+          } @else {
+            <span>{{ channel.value }}</span>
+          }
+        </dd>
+      </div>
+    }
+  </dl>
+</section>

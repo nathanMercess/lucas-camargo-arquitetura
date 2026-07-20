@@ -1,0 +1,185 @@
+:host {
+  display: block;
+}
+
+.portfolio-accordion {
+  position: relative;
+  display: flex;
+  min-height: min(76svh, 780px);
+  overflow: hidden;
+  background: var(--brand-ink);
+}
+
+.portfolio-accordion-panel {
+  position: relative;
+  display: grid;
+  min-width: 0;
+  flex: 1 1 0;
+  align-content: end;
+  gap: 18px;
+  overflow: hidden;
+  padding: clamp(24px, 4vw, 56px);
+  border: 0;
+  color: var(--brand-surface);
+  text-align: left;
+  background-color: var(--brand-ink);
+  cursor: pointer;
+  isolation: isolate;
+  transition: flex-grow 700ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.portfolio-accordion-panel::before,
+.portfolio-accordion-panel::after {
+  position: absolute;
+  z-index: -2;
+  inset: 0;
+  content: '';
+  transition: transform 900ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.portfolio-accordion-panel::after {
+  z-index: -1;
+  opacity: 0.32;
+  background-image:
+    linear-gradient(90deg, transparent 49.7%, rgb(255 255 255 / 35%) 50%, transparent 50.3%),
+    linear-gradient(transparent 49.7%, rgb(255 255 255 / 30%) 50%, transparent 50.3%);
+  background-size: 120px 120px;
+}
+
+.portfolio-accordion-panel--projects::before {
+  background:
+    linear-gradient(118deg, transparent 0 52%, rgb(227 101 113 / 90%) 52.2% 68%, transparent 68.2%),
+    linear-gradient(145deg, #777875, #343a38 55%, #181a19);
+}
+
+.portfolio-accordion-panel--construction::before {
+  background:
+    linear-gradient(62deg, transparent 0 42%, rgb(245 244 244 / 20%) 42.2% 55%, transparent 55.2%),
+    linear-gradient(135deg, #20201f, #5d5a56 52%, #171716);
+}
+
+.portfolio-accordion-panel:hover::before,
+.portfolio-accordion-panel:focus-visible::before,
+.portfolio-accordion-panel--active::before {
+  transform: scale(1.045);
+}
+
+.portfolio-accordion-panel--active {
+  flex-grow: 2.75;
+}
+
+.portfolio-accordion-panel-overlay {
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  background: linear-gradient(180deg, rgb(0 0 0 / 16%), rgb(0 0 0 / 82%));
+}
+
+.portfolio-accordion-panel-index {
+  position: absolute;
+  top: clamp(24px, 4vw, 56px);
+  left: clamp(24px, 4vw, 56px);
+  color: var(--brand-accent);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+}
+
+.portfolio-accordion-panel-title {
+  font-size: clamp(2rem, 5vw, 4.5rem);
+  font-weight: 700;
+  line-height: 0.95;
+  text-transform: uppercase;
+  transition: transform 600ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.portfolio-accordion-panel:not(.portfolio-accordion-panel--active)
+  .portfolio-accordion-panel-title {
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+}
+
+.portfolio-accordion-panel-content {
+  display: grid;
+  max-width: 540px;
+  gap: 20px;
+  opacity: 0;
+  transform: translateY(24px);
+  transition:
+    visibility 260ms ease,
+    opacity 260ms ease,
+    transform 500ms ease;
+  visibility: hidden;
+}
+
+.portfolio-accordion-panel--active .portfolio-accordion-panel-content {
+  visibility: visible;
+  opacity: 1;
+  transform: translateY(0);
+  transition-delay: 220ms;
+}
+
+.portfolio-accordion-panel-description {
+  font-size: clamp(0.95rem, 1.4vw, 1.2rem);
+  line-height: 1.6;
+}
+
+.portfolio-accordion-panel-action {
+  width: fit-content;
+  padding-bottom: 8px;
+  border-bottom: 2px solid var(--brand-accent);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.portfolio-accordion-motion-control {
+  position: absolute;
+  z-index: 3;
+  top: 24px;
+  right: 24px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border: 1px solid rgb(255 255 255 / 45%);
+  color: var(--brand-surface);
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  background: rgb(0 0 0 / 35%);
+  cursor: pointer;
+}
+
+@media (width <= 720px) {
+  .portfolio-accordion {
+    min-height: 720px;
+    flex-direction: column;
+  }
+
+  .portfolio-accordion-panel {
+    min-height: 140px;
+    flex-basis: 0;
+  }
+
+  .portfolio-accordion-panel--active {
+    min-height: 440px;
+  }
+
+  .portfolio-accordion-panel:not(.portfolio-accordion-panel--active)
+    .portfolio-accordion-panel-title {
+    writing-mode: horizontal-tb;
+    transform: none;
+  }
+
+  .portfolio-accordion-panel-title {
+    font-size: clamp(2rem, 12vw, 3.75rem);
+  }
+
+  .portfolio-accordion-motion-control {
+    top: 16px;
+    right: 16px;
+  }
+}

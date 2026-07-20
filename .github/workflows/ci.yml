@@ -17,19 +17,17 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Configure pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 11.9.0
-
       - name: Configure Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 24
-          cache: pnpm
+          cache: yarn
+
+      - name: Enable Corepack
+        run: corepack enable
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: yarn install --frozen-lockfile
 
       - name: Validate project
-        run: pnpm check
+        run: yarn run check
