@@ -28,8 +28,9 @@ function Invoke-Gcloud {
 }
 
 $activeAccounts = @(
-  & $gcloudCommand auth list --filter='status:ACTIVE' --format='value(account)'
-) | Where-Object { $_ }
+  @(& $gcloudCommand auth list --filter='status:ACTIVE' --format='value(account)') |
+    Where-Object { $_ }
+)
 
 if ($LASTEXITCODE -ne 0) {
   throw 'Não foi possível consultar a conta ativa do Google Cloud.'
@@ -40,11 +41,13 @@ if ($activeAccounts.Count -ne 1 -or $activeAccounts[0] -ne $authorizedAccount) {
 }
 
 $verifiedDomains = @(
-  & $gcloudCommand domains list-user-verified `
-    '--format=value(id)' `
-    "--account=$authorizedAccount" `
-    "--project=$ProjectId"
-) | Where-Object { $_ }
+  @(
+    & $gcloudCommand domains list-user-verified `
+      '--format=value(id)' `
+      "--account=$authorizedAccount" `
+      "--project=$ProjectId"
+  ) | Where-Object { $_ }
+)
 
 if ($LASTEXITCODE -ne 0) {
   throw 'Não foi possível consultar os domínios verificados da conta autorizada.'
@@ -96,4 +99,3 @@ foreach ($mappedDomain in $domains) {
     "--project=$ProjectId"
   )
 }
-

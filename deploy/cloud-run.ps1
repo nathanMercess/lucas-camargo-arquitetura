@@ -32,8 +32,9 @@ function Invoke-Gcloud {
 }
 
 $activeAccounts = @(
-  & $gcloudCommand auth list --filter='status:ACTIVE' --format='value(account)'
-) | Where-Object { $_ }
+  @(& $gcloudCommand auth list --filter='status:ACTIVE' --format='value(account)') |
+    Where-Object { $_ }
+)
 
 if ($LASTEXITCODE -ne 0) {
   throw 'Não foi possível consultar a conta ativa do Google Cloud.'
