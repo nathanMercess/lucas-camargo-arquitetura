@@ -31,6 +31,25 @@ function Invoke-Gcloud {
   }
 }
 
+function Test-GcloudResource {
+  param(
+    [Parameter(Mandatory)]
+    [string[]]$GcloudArguments
+  )
+
+  $previousErrorActionPreference = $ErrorActionPreference
+
+  try {
+    $ErrorActionPreference = 'SilentlyContinue'
+    & $gcloudCommand @GcloudArguments *> $null
+
+    return $LASTEXITCODE -eq 0
+  }
+  finally {
+    $ErrorActionPreference = $previousErrorActionPreference
+  }
+}
+
 $activeAccounts = @(
   @(& $gcloudCommand auth list --filter='status:ACTIVE' --format='value(account)') |
     Where-Object { $_ }
@@ -78,12 +97,14 @@ try {
     "--project=$ProjectId"
   )
 
-  & $gcloudCommand artifacts repositories describe $RepositoryName `
-    "--account=$authorizedAccount" `
-    "--location=$Region" `
-    "--project=$ProjectId" *> $null
+  $repositoryExists = Test-GcloudResource -GcloudArguments @(
+    'artifacts', 'repositories', 'describe', $RepositoryName,
+    "--account=$authorizedAccount",
+    "--location=$Region",
+    "--project=$ProjectId"
+  )
 
-  if ($LASTEXITCODE -ne 0) {
+  if (-not $repositoryExists) {
     Invoke-Gcloud -GcloudArguments @(
       'artifacts', 'repositories', 'create', $RepositoryName,
       '--repository-format=docker',
@@ -104,11 +125,13 @@ try {
     '--quiet'
   )
 
-  & $gcloudCommand iam service-accounts describe $runtimeAccountEmail `
-    "--account=$authorizedAccount" `
-    "--project=$ProjectId" *> $null
+  $runtimeAccountExists = Test-GcloudResource -GcloudArguments @(
+    'iam', 'service-accounts', 'describe', $runtimeAccountEmail,
+    "--account=$authorizedAccount",
+    "--project=$ProjectId"
+  )
 
-  if ($LASTEXITCODE -ne 0) {
+  if (-not $runtimeAccountExists) {
     Invoke-Gcloud -GcloudArguments @(
       'iam', 'service-accounts', 'create', $runtimeAccountName,
       '--display-name=Runtime do site público',

@@ -27,6 +27,25 @@ function Invoke-Gcloud {
   }
 }
 
+function Test-GcloudResource {
+  param(
+    [Parameter(Mandatory)]
+    [string[]]$GcloudArguments
+  )
+
+  $previousErrorActionPreference = $ErrorActionPreference
+
+  try {
+    $ErrorActionPreference = 'SilentlyContinue'
+    & $gcloudCommand @GcloudArguments *> $null
+
+    return $LASTEXITCODE -eq 0
+  }
+  finally {
+    $ErrorActionPreference = $previousErrorActionPreference
+  }
+}
+
 $activeAccounts = @(
   @(& $gcloudCommand auth list --filter='status:ACTIVE' --format='value(account)') |
     Where-Object { $_ }
@@ -72,13 +91,15 @@ if (-not $OnlyApex) {
 }
 
 foreach ($mappedDomain in $domains) {
-  & $gcloudCommand beta run domain-mappings describe `
-    "--domain=$mappedDomain" `
-    "--region=$Region" `
-    "--account=$authorizedAccount" `
-    "--project=$ProjectId" *> $null
+  $mappingExists = Test-GcloudResource -GcloudArguments @(
+    'beta', 'run', 'domain-mappings', 'describe',
+    "--domain=$mappedDomain",
+    "--region=$Region",
+    "--account=$authorizedAccount",
+    "--project=$ProjectId"
+  )
 
-  if ($LASTEXITCODE -ne 0) {
+  if (-not $mappingExists) {
     Invoke-Gcloud -GcloudArguments @(
       'beta', 'run', 'domain-mappings', 'create',
       "--service=$ServiceName",
