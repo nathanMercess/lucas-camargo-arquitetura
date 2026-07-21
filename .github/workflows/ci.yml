@@ -72,7 +72,7 @@ jobs:
   deploy-site:
     name: Publicar site
     if: github.event_name == 'push' && github.repository == 'nathanMercess/lucas-camargo-arquitetura'
-    needs: validate-site
+    needs: [validate-site, deploy-worker]
     runs-on: ubuntu-latest
     timeout-minutes: 20
     environment: production
@@ -100,6 +100,7 @@ jobs:
           IMAGE: ${{ env.GCP_REGION }}-docker.pkg.dev/${{ env.GCP_PROJECT_ID }}/${{ env.GCP_ARTIFACT_REPOSITORY }}/${{ env.SERVICE }}:${{ github.sha }}
           R2_PUBLISHED_BASE_URL: ${{ vars.R2_PUBLISHED_BASE_URL }}
         run: |
+          test -n "$R2_PUBLISHED_BASE_URL"
           gcloud auth configure-docker "$GCP_REGION-docker.pkg.dev" --quiet
           docker build --tag "$IMAGE" .
           docker push "$IMAGE"
@@ -121,7 +122,9 @@ jobs:
             --labels="environment=production,managed-by=github-actions" \
             --quiet
       - name: Verificar publicação
-        run: curl --fail --silent --show-error --retry 5 --retry-delay 5 https://lucascamargo.com/ > /dev/null
+        env:
+          R2_PUBLISHED_BASE_URL: ${{ vars.R2_PUBLISHED_BASE_URL }}
+        run: pwsh ./deploy/smoke-check.ps1 -SiteUrl 'https://lucascamargo.com' -ContentBaseUrl "$R2_PUBLISHED_BASE_URL"
 
   deploy-worker:
     name: Publicar Worker

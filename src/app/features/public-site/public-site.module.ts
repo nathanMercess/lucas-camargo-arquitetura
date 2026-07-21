@@ -19,6 +19,7 @@ import { SiteFooterComponent } from './components/site-footer/site-footer.compon
 import { RevealOnScrollDirective } from './directives/reveal-on-scroll.directive';
 import { PortfolioDetailComponent } from './pages/portfolio-detail/portfolio-detail.component';
 import { PortfolioListingComponent } from './pages/portfolio-listing/portfolio-listing.component';
+import { NotFoundComponent } from './pages/not-found/not-found.component';
 import { PublicSiteRoutingModule } from './public-site-routing.module';
 import { PublicSiteComponent } from './public-site.component';
 
@@ -38,6 +39,7 @@ import { PublicSiteComponent } from './public-site.component';
     PortfolioGridComponent,
     PortfolioDetailComponent,
     PortfolioListingComponent,
+    NotFoundComponent,
     ProcessSectionComponent,
     PublicPageShellComponent,
     RichTextComponent,
