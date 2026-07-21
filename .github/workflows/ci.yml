@@ -1,21 +1,26 @@
-name: CI
+name: CI e deploy
 
 on:
   push:
-    branches:
-      - main
+    branches: [main]
   pull_request:
 
 permissions:
   contents: read
 
 concurrency:
-  group: ci-${{ github.ref }}
-  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+  group: app-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  GCP_PROJECT_ID: lucas-camargo-arq-prod
+  GCP_REGION: us-central1
+  GCP_ARTIFACT_REPOSITORY: lucas-camargo
+  SERVICE: lucas-camargo-site
 
 jobs:
   validate-site:
-    name: Validar site público
+    name: Validar site
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -32,13 +37,13 @@ jobs:
         run: |
           corepack enable
           corepack prepare yarn@1.22.22 --activate
-      - name: Instalar dependências
-        run: yarn install --frozen-lockfile --non-interactive
-      - name: Executar validação
-        run: yarn run check
+      - name: Instalar e validar
+        run: |
+          yarn install --frozen-lockfile --non-interactive
+          yarn run check
 
   validate-worker:
-    name: Validar Worker de conteúdo
+    name: Validar Worker
     runs-on: ubuntu-latest
     timeout-minutes: 10
     defaults:
@@ -59,7 +64,97 @@ jobs:
         run: |
           corepack enable
           corepack prepare yarn@1.22.22 --activate
+      - name: Instalar e validar
+        run: |
+          yarn install --frozen-lockfile --non-interactive
+          yarn run check
+
+  deploy-site:
+    name: Publicar site
+    if: github.event_name == 'push' && github.repository == 'nathanMercess/lucas-camargo-arquitetura'
+    needs: validate-site
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    environment: production
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - name: Obter o código
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+      - name: Autenticar no Google Cloud
+        uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093 # v3.0.0
+        with:
+          project_id: ${{ env.GCP_PROJECT_ID }}
+          workload_identity_provider: ${{ vars.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ vars.GCP_DEPLOY_SERVICE_ACCOUNT }}
+      - name: Preparar Google Cloud CLI
+        uses: google-github-actions/setup-gcloud@aa5489c8933f4cc7a4f7d45035b3b1440c9c10db # v3.0.1
+        with:
+          project_id: ${{ env.GCP_PROJECT_ID }}
+          version: '575.0.0'
+      - name: Compilar, enviar e publicar
+        env:
+          IMAGE: ${{ env.GCP_REGION }}-docker.pkg.dev/${{ env.GCP_PROJECT_ID }}/${{ env.GCP_ARTIFACT_REPOSITORY }}/${{ env.SERVICE }}:${{ github.sha }}
+          R2_PUBLISHED_BASE_URL: ${{ vars.R2_PUBLISHED_BASE_URL }}
+        run: |
+          gcloud auth configure-docker "$GCP_REGION-docker.pkg.dev" --quiet
+          docker build --tag "$IMAGE" .
+          docker push "$IMAGE"
+          gcloud run deploy "$SERVICE" \
+            --project="$GCP_PROJECT_ID" \
+            --region="$GCP_REGION" \
+            --image="$IMAGE" \
+            --allow-unauthenticated \
+            --ingress=all \
+            --cpu=1 \
+            --memory=128Mi \
+            --concurrency=80 \
+            --timeout=15s \
+            --min=0 \
+            --max=3 \
+            --port=8080 \
+            --service-account="lucas-site-runtime@$GCP_PROJECT_ID.iam.gserviceaccount.com" \
+            --set-env-vars="CONTENT_BASE_URL=$R2_PUBLISHED_BASE_URL" \
+            --labels="environment=production,managed-by=github-actions" \
+            --quiet
+      - name: Verificar publicação
+        run: curl --fail --silent --show-error --retry 5 --retry-delay 5 https://lucascamargo.com/ > /dev/null
+
+  deploy-worker:
+    name: Publicar Worker
+    if: github.event_name == 'push' && github.repository == 'nathanMercess/lucas-camargo-arquitetura'
+    needs: validate-worker
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment: production
+    defaults:
+      run:
+        working-directory: cloudflare/content-worker
+    steps:
+      - name: Obter o código
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+      - name: Preparar Node.js
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+        with:
+          node-version: '24'
+          cache: yarn
+          cache-dependency-path: cloudflare/content-worker/yarn.lock
+      - name: Preparar Yarn
+        run: |
+          corepack enable
+          corepack prepare yarn@1.22.22 --activate
       - name: Instalar dependências
-        run: yarn install --frozen-lockfile --non-interactive
-      - name: Executar validação
-        run: yarn run check
+        run: |
+          yarn install --frozen-lockfile --non-interactive
+      - name: Publicar
+        env:
+          CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: yarn deploy
+      - name: Verificar publicação
+        run: curl --fail --silent --show-error --retry 5 --retry-delay 5 https://lucas-camargo-content.nathan66merces.workers.dev/content/manifest.json > /dev/null
