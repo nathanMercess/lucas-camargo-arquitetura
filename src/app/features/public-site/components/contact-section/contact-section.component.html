@@ -1,13 +1,15 @@
 <section id="contato" class="contact-section" aria-labelledby="contact-title">
-  <div class="contact-section-introduction">
-    <p class="contact-section-overline" i18n>Contato</p>
-    <h2 id="contact-title" i18n>Vamos conversar sobre o seu projeto?</h2>
-    <p i18n>Conte seus objetivos e dê o primeiro passo para transformar seu espaço.</p>
-  </div>
+  <p class="contact-section-overline" i18n>Comece uma conversa</p>
+  <h2 id="contact-title" appRevealOnScroll i18n>Seu próximo espaço<br />pode começar <em>agora.</em></h2>
+
+  <a class="contact-section-cta" appRevealOnScroll style="--reveal-delay: 90ms"
+    href="mailto:arquiteto@lucascamargo.com?subject=Solicitação%20de%20orçamento" i18n>
+    Solicitar um orçamento <span aria-hidden="true">↗</span>
+  </a>
 
   <dl class="contact-section-list">
-    @for (channel of contactChannels(); track channel.id) {
-      <div class="contact-section-item">
+    @for (channel of contactChannels(); track channel.id; let position = $index) {
+      <div class="contact-section-item" appRevealOnScroll [style.--reveal-delay]="position * 80 + 'ms'">
         <dt>{{ channel.label }}</dt>
         <dd>
           @if (channel.href) {

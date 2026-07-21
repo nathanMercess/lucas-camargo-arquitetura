@@ -1,4 +1,5 @@
-import { ChangeDetectionStrategy, Component, input, signal } from '@angular/core';
+import { DOCUMENT } from '@angular/common';
+import { ChangeDetectionStrategy, Component, inject, input, signal } from '@angular/core';
 import { NavigationItem } from '../../../../shared/models/navigation-item.model';
 
 @Component({
@@ -13,11 +14,15 @@ export class SiteHeaderComponent {
 
   public readonly isMenuOpen = signal<boolean>(false);
 
+  private readonly document = inject(DOCUMENT);
+
   public toggleMenu(): void {
     this.isMenuOpen.update((isOpen) => !isOpen);
+    this.document.body.classList.toggle('site-menu-open', this.isMenuOpen());
   }
 
   public closeMenu(): void {
     this.isMenuOpen.set(false);
+    this.document.body.classList.remove('site-menu-open');
   }
 }

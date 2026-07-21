@@ -3,28 +3,25 @@
 <section id="inicio" class="hero-section" aria-labelledby="hero-title">
   <app-site-header [navigationItems]="navigationItems()" />
 
-  <div class="hero-section-grid" aria-hidden="true"></div>
-  <div class="hero-section-plane hero-section-plane--primary" aria-hidden="true"></div>
-  <div class="hero-section-plane hero-section-plane--secondary" aria-hidden="true"></div>
+  <img class="hero-section-image" src="assets/editorial/architecture-reference.jpg"
+    alt="Referência visual de uma residência contemporânea integrada à paisagem" i18n-alt />
+  <div class="hero-section-scrim" aria-hidden="true"></div>
 
   <div class="hero-section-content">
-    <p class="hero-section-overline" i18n>Arquitetura e construção · São Caetano do Sul</p>
+    <p class="hero-section-overline" i18n>São Paulo · Arquitetura + construção</p>
     <h1 id="hero-title" i18n>
-      Espaços com
-      <span>excelência</span>
-      e propósito.
+      Espaços que<br />
+      <em>permanecem.</em>
     </h1>
-    <p class="hero-section-description" i18n>
-      Entender seus objetivos, valorizar seus sonhos e transformá-los em arquitetura.
-    </p>
-    <div class="hero-section-actions">
-      <a pButton class="hero-section-primary-link" href="#portfolio" i18n>Conheça o portfólio</a>
-      <a pButton class="hero-section-secondary-link" href="#contato" i18n>Fale com Lucas</a>
+
+    <div class="hero-section-bottom">
+      <p i18n>Do primeiro traço<br />à construção.</p>
+      <a class="hero-section-portfolio-link" href="#portfolio" i18n>
+        Explorar portfólio <span aria-hidden="true">↘</span>
+      </a>
     </div>
   </div>
 
-  <a class="hero-section-scroll-cue" href="#conteudo" aria-label="Ir para o conteúdo" i18n-aria-label>
-    <span aria-hidden="true"></span>
-    <span i18n>Descubra</span>
-  </a>
+  <p class="hero-section-index" aria-hidden="true">LC / 01</p>
+  <p class="hero-section-caption" i18n>Imagem de referência <span aria-hidden="true">—</span> direção visual</p>
 </section>

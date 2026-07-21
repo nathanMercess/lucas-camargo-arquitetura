@@ -26,7 +26,7 @@ describe('HeroSectionComponent', () => {
   it('should render the brand mission in the hero', () => {
     const compiled = fixture.nativeElement as HTMLElement;
 
-    expect(compiled.querySelector('h1')?.textContent).toContain('excelência');
-    expect(compiled.textContent).toContain('valorizar seus sonhos');
+    expect(compiled.querySelector('h1')?.textContent).toContain('permanecem');
+    expect(compiled.textContent).toContain('Do primeiro traço');
   });
 });

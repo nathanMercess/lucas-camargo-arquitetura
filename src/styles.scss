@@ -2,19 +2,23 @@
   --brand-accent: #e36571;
   --brand-accent-soft: #f8e4e6;
   --brand-ink: #333332;
+  --brand-ink-deep: #262625;
   --brand-surface-muted: #f5f4f4;
   --brand-surface: #ffffff;
   --brand-text-muted: #6a6a68;
-  --brand-border: #d8d7d5;
+  --brand-border: rgb(51 51 50 / 20%);
   --brand-focus: #e36571;
-  --content-max-width: 1280px;
-  --page-gutter: clamp(20px, 5vw, 72px);
+  --content-max-width: 1440px;
+  --page-gutter: clamp(22px, 4.5vw, 76px);
+  --font-brand: 'Century Gothic', CenturyGothic, 'Avenir Next', Futura, sans-serif;
+  --font-data: 'Cascadia Mono', 'Aptos Mono', 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
+  --ease-smooth: cubic-bezier(0.22, 1, 0.36, 1);
 
   color: var(--brand-ink);
-  background: var(--brand-surface);
-  font-family: 'Century Gothic', CenturyGothic, AppleGothic, sans-serif;
+  background: var(--brand-surface-muted);
+  font-family: var(--font-brand);
   font-synthesis: none;
-  line-height: 1.5;
+  line-height: 1.45;
   text-rendering: optimizeLegibility;
 }
 
@@ -32,7 +36,12 @@ html {
 body {
   min-height: 100%;
   margin: 0;
-  background: var(--brand-surface);
+  overflow-x: hidden;
+  background: var(--brand-surface-muted);
+}
+
+body.site-menu-open {
+  overflow: hidden;
 }
 
 body,
@@ -64,16 +73,58 @@ svg {
 button,
 a {
   border-radius: 0;
+  -webkit-tap-highlight-color: transparent;
 }
 
 :focus-visible {
-  outline: 3px solid var(--brand-focus);
+  outline: 2px solid var(--brand-focus);
   outline-offset: 4px;
 }
 
 ::selection {
   color: var(--brand-surface);
   background: var(--brand-accent);
+}
+
+.reveal-on-scroll {
+  opacity: 0;
+  transform: translate3d(0, clamp(22px, 3vw, 46px), 0);
+  transition:
+    opacity 750ms var(--ease-smooth),
+    transform 950ms var(--ease-smooth);
+  transition-delay: var(--reveal-delay, 0ms);
+  will-change: opacity, transform;
+}
+
+.reveal-on-scroll.reveal-on-scroll--visible {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+  will-change: auto;
+}
+
+:where(
+  .hero-section-overline,
+  .hero-section-index,
+  .hero-section-caption,
+  .public-site-overline,
+  .public-site-section-index,
+  .manifesto-section-index,
+  .metrics-section-index,
+  .metrics-section-item span,
+  .process-section-overline,
+  .process-section article > span,
+  .contact-section-overline,
+  .contact-section-item dt,
+  .portfolio-accordion-panel-index,
+  .portfolio-accordion-panel-reference,
+  .portfolio-accordion-panel-action,
+  .portfolio-accordion-motion-control,
+  .site-footer-secondary
+) {
+  font-variant-ligatures: none;
+  font-variant-numeric: tabular-nums;
+  font-weight: 500;
+  text-rendering: geometricPrecision;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -88,5 +139,12 @@ a {
 
   html {
     scroll-behavior: auto;
+  }
+
+  .reveal-on-scroll,
+  .reveal-on-scroll.reveal-on-scroll--visible {
+    opacity: 1;
+    transform: none;
+    transition: none;
   }
 }

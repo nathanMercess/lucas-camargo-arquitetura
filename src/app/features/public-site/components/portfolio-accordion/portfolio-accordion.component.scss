@@ -5,181 +5,204 @@
 .portfolio-accordion {
   position: relative;
   display: flex;
-  min-height: min(76svh, 780px);
+  min-height: 88svh;
   overflow: hidden;
   background: var(--brand-ink);
 }
 
 .portfolio-accordion-panel {
   position: relative;
-  display: grid;
+  display: flex;
   min-width: 0;
-  flex: 1 1 0;
-  align-content: end;
-  gap: 18px;
+  padding: clamp(28px, 4vw, 58px);
   overflow: hidden;
-  padding: clamp(24px, 4vw, 56px);
-  border: 0;
+  flex: 1 1 0;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: space-between;
   color: var(--brand-surface);
   text-align: left;
+  border: 0;
+  border-right: 1px solid rgb(255 255 255 / 34%);
   background-color: var(--brand-ink);
+  background-position: center;
+  background-size: cover;
   cursor: pointer;
   isolation: isolate;
   transition: flex-grow 700ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-.portfolio-accordion-panel::before,
-.portfolio-accordion-panel::after {
-  position: absolute;
-  z-index: -2;
-  inset: 0;
-  content: '';
-  transition: transform 900ms cubic-bezier(0.22, 1, 0.36, 1);
+.portfolio-accordion-panel:last-of-type {
+  border-right: 0;
 }
 
-.portfolio-accordion-panel::after {
-  z-index: -1;
-  opacity: 0.32;
-  background-image:
-    linear-gradient(90deg, transparent 49.7%, rgb(255 255 255 / 35%) 50%, transparent 50.3%),
-    linear-gradient(transparent 49.7%, rgb(255 255 255 / 30%) 50%, transparent 50.3%);
-  background-size: 120px 120px;
+.portfolio-accordion-panel--projects {
+  background-image: url('/assets/editorial/interior-reference.jpg');
 }
 
-.portfolio-accordion-panel--projects::before {
-  background:
-    linear-gradient(118deg, transparent 0 52%, rgb(227 101 113 / 90%) 52.2% 68%, transparent 68.2%),
-    linear-gradient(145deg, #777875, #343a38 55%, #181a19);
-}
-
-.portfolio-accordion-panel--construction::before {
-  background:
-    linear-gradient(62deg, transparent 0 42%, rgb(245 244 244 / 20%) 42.2% 55%, transparent 55.2%),
-    linear-gradient(135deg, #20201f, #5d5a56 52%, #171716);
-}
-
-.portfolio-accordion-panel:hover::before,
-.portfolio-accordion-panel:focus-visible::before,
-.portfolio-accordion-panel--active::before {
-  transform: scale(1.045);
+.portfolio-accordion-panel--construction {
+  background-image: url('/assets/editorial/construction-reference.jpg');
 }
 
 .portfolio-accordion-panel--active {
-  flex-grow: 2.75;
+  flex-grow: 2.15;
 }
 
 .portfolio-accordion-panel-overlay {
   position: absolute;
   z-index: -1;
   inset: 0;
-  background: linear-gradient(180deg, rgb(0 0 0 / 16%), rgb(0 0 0 / 82%));
+  background: rgb(29 29 28 / 68%);
+  transition: background 500ms ease;
 }
 
-.portfolio-accordion-panel-index {
+.portfolio-accordion-panel:hover .portfolio-accordion-panel-overlay,
+.portfolio-accordion-panel:focus-visible .portfolio-accordion-panel-overlay,
+.portfolio-accordion-panel--active .portfolio-accordion-panel-overlay {
+  background: linear-gradient(180deg, rgb(29 29 28 / 22%), rgb(29 29 28 / 62%));
+}
+
+.portfolio-accordion-panel-index,
+.portfolio-accordion-panel-reference {
+  position: relative;
+  z-index: 1;
+  font-family: var(--font-data);
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.portfolio-accordion-panel-reference {
   position: absolute;
-  top: clamp(24px, 4vw, 56px);
-  left: clamp(24px, 4vw, 56px);
-  color: var(--brand-accent);
-  font-size: 0.75rem;
-  font-weight: 600;
-  letter-spacing: 0.18em;
+  top: clamp(28px, 4vw, 58px);
+  right: clamp(28px, 4vw, 58px);
+  color: rgb(255 255 255 / 62%);
 }
 
 .portfolio-accordion-panel-title {
-  font-size: clamp(2rem, 5vw, 4.5rem);
+  position: relative;
+  z-index: 1;
+  align-self: center;
+  font-size: clamp(2.4rem, 5vw, 6rem);
   font-weight: 700;
-  line-height: 0.95;
+  letter-spacing: -0.06em;
+  line-height: 0.92;
   text-transform: uppercase;
-  transition: transform 600ms cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.portfolio-accordion-panel:not(.portfolio-accordion-panel--active)
-  .portfolio-accordion-panel-title {
   writing-mode: vertical-rl;
   transform: rotate(180deg);
+  transition: transform 500ms ease;
+}
+
+.portfolio-accordion-panel--active .portfolio-accordion-panel-title {
+  align-self: flex-start;
+  writing-mode: horizontal-tb;
+  transform: none;
 }
 
 .portfolio-accordion-panel-content {
+  position: relative;
+  z-index: 1;
   display: grid;
-  max-width: 540px;
-  gap: 20px;
-  opacity: 0;
-  transform: translateY(24px);
-  transition:
-    visibility 260ms ease,
-    opacity 260ms ease,
-    transform 500ms ease;
+  max-width: 620px;
+  grid-template-columns: 1.3fr 0.7fr;
+  align-items: end;
+  gap: 32px;
   visibility: hidden;
+  opacity: 0;
+  transform: translateY(20px);
+  transition:
+    visibility 300ms ease,
+    opacity 300ms ease,
+    transform 450ms ease;
 }
 
 .portfolio-accordion-panel--active .portfolio-accordion-panel-content {
   visibility: visible;
   opacity: 1;
   transform: translateY(0);
-  transition-delay: 220ms;
+  transition-delay: 180ms;
 }
 
 .portfolio-accordion-panel-description {
-  font-size: clamp(0.95rem, 1.4vw, 1.2rem);
-  line-height: 1.6;
+  font-size: clamp(0.9rem, 1.25vw, 1.1rem);
+  line-height: 1.65;
 }
 
 .portfolio-accordion-panel-action {
-  width: fit-content;
-  padding-bottom: 8px;
-  border-bottom: 2px solid var(--brand-accent);
-  font-size: 0.75rem;
-  font-weight: 600;
-  letter-spacing: 0.14em;
+  display: flex;
+  padding-bottom: 9px;
+  align-items: center;
+  justify-content: space-between;
+  font-family: var(--font-data);
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
+  border-bottom: 1px solid currentColor;
+}
+
+.portfolio-accordion-panel-action b {
+  font-size: 1rem;
 }
 
 .portfolio-accordion-motion-control {
   position: absolute;
   z-index: 3;
-  top: 24px;
-  right: 24px;
+  right: 22px;
+  bottom: 22px;
   display: flex;
+  padding: 9px 11px;
   align-items: center;
   gap: 8px;
-  padding: 10px 12px;
-  border: 1px solid rgb(255 255 255 / 45%);
   color: var(--brand-surface);
-  font-size: 0.7rem;
-  font-weight: 600;
-  letter-spacing: 0.12em;
+  font-family: var(--font-data);
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
-  background: rgb(0 0 0 / 35%);
+  border: 1px solid rgb(255 255 255 / 42%);
+  background: rgb(0 0 0 / 42%);
   cursor: pointer;
+  transition:
+    border-color 300ms ease,
+    background 300ms ease,
+    transform 400ms var(--ease-smooth);
+}
+
+.portfolio-accordion-motion-control:hover,
+.portfolio-accordion-motion-control:focus-visible {
+  border-color: var(--brand-accent);
+  background: rgb(227 101 113 / 82%);
+  transform: translateY(-3px);
 }
 
 @media (width <= 720px) {
   .portfolio-accordion {
-    min-height: 720px;
+    min-height: auto;
     flex-direction: column;
   }
 
   .portfolio-accordion-panel {
-    min-height: 140px;
-    flex-basis: 0;
+    min-height: 52svh;
+    border-right: 0;
+    border-bottom: 1px solid rgb(255 255 255 / 34%);
   }
 
   .portfolio-accordion-panel--active {
-    min-height: 440px;
+    min-height: 66svh;
   }
 
-  .portfolio-accordion-panel:not(.portfolio-accordion-panel--active)
-    .portfolio-accordion-panel-title {
+  .portfolio-accordion-panel-title,
+  .portfolio-accordion-panel--active .portfolio-accordion-panel-title {
+    align-self: flex-start;
+    font-size: clamp(3rem, 13vw, 5rem);
     writing-mode: horizontal-tb;
     transform: none;
   }
 
-  .portfolio-accordion-panel-title {
-    font-size: clamp(2rem, 12vw, 3.75rem);
+  .portfolio-accordion-panel-content {
+    grid-template-columns: 1fr;
   }
 
   .portfolio-accordion-motion-control {
-    top: 16px;
-    right: 16px;
+    display: none;
   }
 }

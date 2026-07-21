@@ -27,7 +27,9 @@ describe('ContactSectionComponent', () => {
   it('should render contact channels without decorative icons', () => {
     const compiled = fixture.nativeElement as HTMLElement;
 
-    expect(compiled.querySelector('a')?.textContent).toContain('arquiteto@lucascamargo.com');
+    const emailLink = compiled.querySelector('a[href="mailto:arquiteto@lucascamargo.com"]');
+
+    expect(emailLink?.textContent).toContain('arquiteto@lucascamargo.com');
     expect(compiled.querySelector('svg')).toBeNull();
   });
 });

@@ -1,0 +1,15 @@
+.angular
+.git
+.github
+.idea
+.vscode
+coverage
+dist
+docs
+node_modules
+__screenshots__
+*.log
+*.md
+deploy/*.json
+deploy/*.ps1
+

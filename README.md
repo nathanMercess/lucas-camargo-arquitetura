@@ -222,13 +222,13 @@ A relação entre álbuns e categorias é muitos-para-muitos, pois um mesmo álb
 - Receber a fonte web com licença de uso ou definir fallback aprovado.
 - Inventariar textos, serviços, categorias, álbuns, fotos e redes sociais.
 - Confirmar métricas, contatos e links do footer.
-- Definir API/CMS, autenticação, armazenamento e fluxo de publicação.
+- [Concluído] Definir API própria, IAP, armazenamento R2 e publicação versionada.
 
 ### 2. Sistema visual e estrutura pública
 
-- [Em andamento] Implementar grid, tipografia, espaçamento, breakpoints e componentes básicos.
+- [Concluído na primeira versão] Implementar grid, tipografia, espaçamento, breakpoints e componentes básicos.
 - [Concluído na primeira versão] Construir header, navegação, seções full-screen e footer.
-- [Em andamento] Validar responsividade, teclado, contraste e movimento reduzido.
+- [Concluído na primeira versão] Validar responsividade, teclado, contraste e movimento reduzido.
 
 ### 3. Portfólio
 
@@ -238,10 +238,10 @@ A relação entre álbuns e categorias é muitos-para-muitos, pois um mesmo álb
 
 ### 4. Administração
 
-- Implementar login e autorização.
+- [Em andamento] Implementar aplicação administrativa separada, login e autorização por IAP.
 - CRUD e ordenação de seções, categorias, álbuns e mídias.
 - Preview, rascunho/publicação e validações de upload.
-- Edição de perfil, métricas, contatos, redes e footer.
+- Edição de perfil, tema, SEO, navegação, métricas, contatos, redes e footer.
 
 ### 5. Qualidade e lançamento
 
@@ -252,14 +252,19 @@ A relação entre álbuns e categorias é muitos-para-muitos, pois um mesmo álb
 
 ## Decisões pendentes
 
-- API própria ou CMS headless.
-- Provedor de hospedagem, imagens e CDN.
 - Provedor de mapa e política de consentimento.
 - Formulário de orçamento: somente link, e-mail, WhatsApp ou envio pela API.
-- Regras de autenticação e número de usuários do painel.
 - Conteúdo bilíngue ou apenas português.
 - Escopo de SEO local e analytics.
 - Licença e arquivos web da Century Gothic.
+- Criação da conta/buckets do Cloudflare R2 e emissão dos tokens restritos.
+- Validação do TXT e dos registros finais do domínio na Hostinger.
+
+## Infraestrutura e segurança
+
+- [Cloud Run e domínio](docs/cloud-run.md)
+- [Armazenamento e versionamento no R2](docs/storage-r2.md)
+- [Auditoria e controle de acesso](docs/access-control-audit.md)
 
 ## Materiais de origem
 

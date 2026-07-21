@@ -12,9 +12,9 @@ import { Profile } from '../../../shared/models/profile.model';
 })
 export class PublicSiteContentService {
   public readonly navigationItems = signal<readonly NavigationItem[]>([
-    { id: 'practice', label: 'Atuação', href: '#atuacao' },
+    { id: 'practice', label: 'Serviços', href: '#atuacao' },
     { id: 'portfolio', label: 'Portfólio', href: '#portfolio' },
-    { id: 'about', label: 'Sobre mim', href: '#sobre' },
+    { id: 'about', label: 'Sobre', href: '#sobre' },
     { id: 'contact', label: 'Contato', href: '#contato' },
   ]);
 
@@ -38,7 +38,7 @@ export class PublicSiteContentService {
   public readonly portfolioCategories = signal<readonly PortfolioCategory[]>([
     {
       id: 'projects',
-      index: '01',
+      index: 'A / 01',
       title: 'Projetos',
       description:
         'Concepção, estudo e detalhamento de espaços que traduzem objetivos em soluções arquitetônicas.',
@@ -46,7 +46,7 @@ export class PublicSiteContentService {
     },
     {
       id: 'construction-work',
-      index: '02',
+      index: 'A / 02',
       title: 'Obras',
       description:
         'A materialização dos projetos, acompanhada com atenção aos detalhes, à execução e à qualidade.',
@@ -71,7 +71,7 @@ export class PublicSiteContentService {
     {
       id: 'phone',
       label: 'Telefone',
-      value: '11 98668-1572',
+      value: '+55 11 98668—1572',
       href: 'tel:+5511986681572',
     },
     {
@@ -83,7 +83,7 @@ export class PublicSiteContentService {
     {
       id: 'location',
       label: 'Localização',
-      value: 'São Caetano do Sul - SP',
+      value: 'São Caetano do Sul — SP',
     },
   ]);
 

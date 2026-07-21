@@ -1,12 +1,13 @@
 <header class="site-header" [class.site-header--menu-open]="isMenuOpen()">
-  <a class="site-header-logo-link" href="#inicio" aria-label="Ir para o início" i18n-aria-label>
+  <a class="site-header-logo-link" href="#inicio" aria-label="Ir para o início" i18n-aria-label
+    (click)="closeMenu()">
     <img class="site-header-logo" src="assets/brand/logo-light.png"
       alt="Lucas Camargo - Arquitetura e Construção" i18n-alt />
   </a>
 
   <button pButton class="site-header-menu-button" type="button" aria-controls="site-navigation"
-    [attr.aria-expanded]="isMenuOpen()"
-    [attr.aria-label]="isMenuOpen() ? 'Fechar menu' : 'Abrir menu'" (click)="toggleMenu()">
+    [attr.aria-expanded]="isMenuOpen()" [attr.aria-label]="isMenuOpen() ? 'Fechar menu' : 'Abrir menu'"
+    (click)="toggleMenu()">
     <span aria-hidden="true"></span>
     <span aria-hidden="true"></span>
   </button>
@@ -17,10 +18,10 @@
         {{ item.label }}
       </a>
     }
-    <a pButton class="site-header-budget-link"
-      href="mailto:arquiteto@lucascamargo.com?subject=Solicitação%20de%20orçamento"
-      i18n>
-      Solicitar orçamento
-    </a>
   </nav>
+
+  <a class="site-header-budget-link"
+    href="mailto:arquiteto@lucascamargo.com?subject=Solicitação%20de%20orçamento" i18n>
+    Iniciar um projeto
+  </a>
 </header>
