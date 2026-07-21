@@ -1,3 +1,6 @@
+@if (visualBuilderDocument(); as visualBuilder) {
+  <app-custom-page-renderer [document]="visualBuilder" />
+} @else {
 <div class="public-site-shell">
   <main id="conteudo">
     @for (section of contentService.visibleSections(); track section.id) {
@@ -102,3 +105,4 @@
   <app-site-footer [config]="contentService.config().footer" [uiLabels]="contentService.config().uiLabels"
     [logoPath]="contentService.resolveMediaPath(contentService.config().footer.logo.assetId)" />
 </div>
+}

@@ -4,6 +4,7 @@ import { ButtonModule } from 'primeng/button';
 import { GalleriaModule } from 'primeng/galleria';
 
 import { ContactSectionComponent } from './components/contact-section/contact-section.component';
+import { CustomPageRendererComponent } from './components/custom-page-renderer/custom-page-renderer.component';
 import { HeroSectionComponent } from './components/hero-section/hero-section.component';
 import { ManifestoSectionComponent } from './components/manifesto-section/manifesto-section.component';
 import { MetricsSectionComponent } from './components/metrics-section/metrics-section.component';
@@ -26,6 +27,7 @@ import { PublicSiteComponent } from './public-site.component';
   declarations: [
     PublicSiteComponent,
     ContactSectionComponent,
+    CustomPageRendererComponent,
     HeroSectionComponent,
     ManifestoSectionComponent,
     MetricsSectionComponent,

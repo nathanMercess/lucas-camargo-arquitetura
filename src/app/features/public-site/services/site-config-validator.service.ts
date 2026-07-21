@@ -44,6 +44,12 @@ export class SiteConfigValidatorService {
       return false;
 
     if (
+      value['visualBuilder'] !== undefined &&
+      !this.isVisualBuilderDocument(value['visualBuilder'])
+    )
+      return false;
+
+    if (
       !this.isArrayOf(value['media'], (item) => this.isMediaAsset(item)) ||
       !this.isArrayOf(value['navigationItems'], (item) => this.isNavigationItem(item)) ||
       !this.isArrayOf(value['sections'], (item) => this.isSection(item)) ||
@@ -218,6 +224,19 @@ export class SiteConfigValidatorService {
       this.isNonEmptyString(value['location']) &&
       this.isNonEmptyString(value['copyrightOwner']) &&
       this.isLink(value['backToTopLink'])
+    );
+  }
+
+  private isVisualBuilderDocument(value: unknown): boolean {
+    if (!this.isRecord(value) || !this.isRecord(value['projectData']))
+      return false;
+
+    return (
+      typeof value['enabled'] === 'boolean' &&
+      typeof value['html'] === 'string' &&
+      value['html'].length <= 2_000_000 &&
+      typeof value['css'] === 'string' &&
+      value['css'].length <= 1_000_000
     );
   }
 
