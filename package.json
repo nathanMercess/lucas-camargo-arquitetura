@@ -1,35 +1,20 @@
 {
   "name": "lucas-camargo-arquitetura",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "scripts": {
     "ng": "ng",
     "start": "ng serve lucas-camargo-arquitetura",
-    "start:admin": "ng serve admin --port 4201",
-    "start:admin-api": "yarn workspace @lucas-camargo/admin-api start",
     "build": "ng build lucas-camargo-arquitetura",
-    "build:admin": "ng build admin",
-    "build:admin-api": "yarn workspace @lucas-camargo/admin-api build",
-    "build:all": "yarn build && yarn build:admin && yarn build:admin-api",
     "watch": "ng build lucas-camargo-arquitetura --watch --configuration development",
-    "watch:admin": "ng build admin --watch --configuration development",
-    "test": "yarn test:site && yarn test:admin && yarn test:admin-api",
-    "test:site": "ng test lucas-camargo-arquitetura --watch=false",
-    "test:admin": "ng test admin --watch=false",
-    "test:admin-api": "yarn workspace @lucas-camargo/admin-api test",
+    "test": "ng test lucas-camargo-arquitetura --watch=false",
     "test:watch": "ng test lucas-camargo-arquitetura",
-    "lint": "yarn lint:site && yarn lint:admin && yarn lint:admin-api",
-    "lint:site": "ng lint lucas-camargo-arquitetura",
-    "lint:admin": "ng lint admin",
-    "lint:admin-api": "yarn workspace @lucas-camargo/admin-api lint",
+    "lint": "ng lint lucas-camargo-arquitetura",
     "verify:content": "node scripts/verify-content-manifest.mjs",
-    "check": "yarn run verify:content && yarn lint && yarn test && yarn build:all",
+    "check": "yarn run verify:content && yarn lint && yarn test && yarn build",
     "check:worker": "yarn --cwd cloudflare/content-worker install --frozen-lockfile --non-interactive && yarn --cwd cloudflare/content-worker run check",
     "check:all": "yarn run check && yarn run check:worker"
   },
   "private": true,
-  "workspaces": [
-    "server/admin-api"
-  ],
   "packageManager": "yarn@1.22.22",
   "engines": {
     "node": "^20.19.0 || ^22.12.0 || ^24.0.0"

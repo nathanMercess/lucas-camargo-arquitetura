@@ -7,7 +7,6 @@ WORKDIR /app
 RUN corepack enable && corepack prepare yarn@1.22.22 --activate
 
 COPY package.json yarn.lock ./
-COPY server/admin-api/package.json server/admin-api/package.json
 RUN yarn install --frozen-lockfile --non-interactive
 
 COPY . .
