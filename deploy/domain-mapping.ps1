@@ -27,25 +27,6 @@ function Invoke-Gcloud {
   }
 }
 
-function Test-GcloudResource {
-  param(
-    [Parameter(Mandatory)]
-    [string[]]$GcloudArguments
-  )
-
-  $previousErrorActionPreference = $ErrorActionPreference
-
-  try {
-    $ErrorActionPreference = 'SilentlyContinue'
-    & $gcloudCommand @GcloudArguments *> $null
-
-    return $LASTEXITCODE -eq 0
-  }
-  finally {
-    $ErrorActionPreference = $previousErrorActionPreference
-  }
-}
-
 $activeAccounts = @(
   @(& $gcloudCommand auth list --filter='status:ACTIVE' --format='value(account)') |
     Where-Object { $_ }
@@ -90,33 +71,80 @@ if (-not $OnlyApex) {
   $domains += "www.$Domain"
 }
 
-foreach ($mappedDomain in $domains) {
-  $mappingExists = Test-GcloudResource -GcloudArguments @(
-    'beta', 'run', 'domain-mappings', 'describe',
-    "--domain=$mappedDomain",
-    "--region=$Region",
-    "--account=$authorizedAccount",
-    "--project=$ProjectId"
-  )
+$accessToken = (& $gcloudCommand auth print-access-token "--account=$authorizedAccount").Trim()
 
-  if (-not $mappingExists) {
-    Invoke-Gcloud -GcloudArguments @(
-      'beta', 'run', 'domain-mappings', 'create',
-      "--service=$ServiceName",
-      "--domain=$mappedDomain",
-      "--region=$Region",
-      "--account=$authorizedAccount",
-      "--project=$ProjectId",
-      '--quiet'
-    )
+if ($LASTEXITCODE -ne 0 -or -not $accessToken) {
+  throw 'Não foi possível obter um token temporário da conta autorizada.'
+}
+
+try {
+  $requestHeaders = @{
+    Authorization = "Bearer $accessToken"
+    'Content-Type' = 'application/json'
   }
+  $collectionUri = "https://${Region}-run.googleapis.com/apis/domains.cloudrun.com/v1/namespaces/$ProjectId/domainmappings"
 
-  Invoke-Gcloud -GcloudArguments @(
-    'beta', 'run', 'domain-mappings', 'describe',
-    "--domain=$mappedDomain",
-    "--region=$Region",
-    '--format=yaml(status.resourceRecords,status.conditions)',
-    "--account=$authorizedAccount",
-    "--project=$ProjectId"
-  )
+  foreach ($mappedDomain in $domains) {
+    $encodedDomain = [Uri]::EscapeDataString($mappedDomain)
+    $mappingUri = "$collectionUri/$encodedDomain"
+    $mapping = $null
+
+    try {
+      $mapping = Invoke-RestMethod -Method Get -Uri $mappingUri -Headers $requestHeaders -TimeoutSec 30
+    }
+    catch {
+      $statusCode = [int]$_.Exception.Response.StatusCode
+
+      if ($statusCode -ne 404) {
+        throw
+      }
+
+      $requestBody = @{
+        apiVersion = 'domains.cloudrun.com/v1'
+        kind = 'DomainMapping'
+        metadata = @{
+          name = $mappedDomain
+          namespace = $ProjectId
+        }
+        spec = @{
+          routeName = $ServiceName
+          certificateMode = 'AUTOMATIC'
+        }
+      } | ConvertTo-Json -Depth 5
+
+      $mapping = Invoke-RestMethod -Method Post -Uri $collectionUri -Headers $requestHeaders `
+        -Body $requestBody -TimeoutSec 60
+    }
+
+    if ($mapping.spec.routeName -ne $ServiceName) {
+      throw "O domínio $mappedDomain já está associado ao serviço $($mapping.spec.routeName)."
+    }
+
+    Write-Host "`nDomínio: $mappedDomain"
+
+    $mapping.status.resourceRecords | ForEach-Object {
+      $recordNameProperty = $_.PSObject.Properties['name']
+
+      [PSCustomObject]@{
+        Type = $_.type
+        Name = if ($recordNameProperty) { $recordNameProperty.Value } else { '@' }
+        Value = $_.rrdata
+      }
+    } | Format-Table -AutoSize
+
+    $mapping.status.conditions | ForEach-Object {
+      $reasonProperty = $_.PSObject.Properties['reason']
+      $messageProperty = $_.PSObject.Properties['message']
+
+      [PSCustomObject]@{
+        Condition = $_.type
+        Status = $_.status
+        Reason = if ($reasonProperty) { $reasonProperty.Value } else { '' }
+        Message = if ($messageProperty) { $messageProperty.Value } else { '' }
+      }
+    } | Format-Table -AutoSize -Wrap
+  }
+}
+finally {
+  Remove-Variable accessToken -ErrorAction SilentlyContinue
 }

@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
-import { FooterLink } from '../../../../shared/models/footer-link.model';
+import { SiteFooter } from '../../../../shared/models/site-footer.model';
+import { SiteUiLabels } from '../../../../shared/models/site-ui-labels.model';
 
 @Component({
   selector: 'app-site-footer',
@@ -9,7 +10,11 @@ import { FooterLink } from '../../../../shared/models/footer-link.model';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SiteFooterComponent {
-  public readonly footerLinks = input.required<readonly FooterLink[]>();
+  public readonly config = input.required<SiteFooter>();
+
+  public readonly uiLabels = input.required<SiteUiLabels>();
+
+  public readonly logoPath = input.required<string>();
 
   public readonly currentYear = new Date().getFullYear();
 }

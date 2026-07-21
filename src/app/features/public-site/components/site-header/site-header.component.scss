@@ -9,6 +9,8 @@
 
 .site-header {
   display: grid;
+  width: 100%;
+  min-width: 0;
   min-height: 102px;
   align-items: center;
   grid-template-columns: 1.25fr 1fr 1.25fr;
@@ -33,9 +35,14 @@
 
 .site-header-navigation {
   display: flex;
+  min-width: 0;
   align-items: center;
   justify-content: center;
   gap: clamp(18px, 2.3vw, 42px);
+}
+
+.site-header-navigation-cta {
+  display: none;
 }
 
 .site-header-navigation-link,
@@ -82,18 +89,24 @@
   width: 44px;
   height: 44px;
   padding: 10px 6px;
-  color: inherit;
+  justify-self: end;
+  color: var(--brand-surface);
   border: 0;
   background: transparent;
   cursor: pointer;
+  touch-action: manipulation;
 }
 
-.site-header-menu-button span {
+.site-header-menu-button::before,
+.site-header-menu-button::after {
   position: absolute;
   right: 7px;
   left: 7px;
+  top: 50%;
+  display: block;
   height: 1px;
-  background: currentColor;
+  background: var(--brand-surface);
+  content: '';
   transition: transform 280ms ease;
 }
 
@@ -109,12 +122,16 @@
   }
 }
 
-.site-header-menu-button span:first-child {
+.site-header-menu-button::before {
   transform: translateY(-5px);
 }
 
-.site-header-menu-button span:last-child {
+.site-header-menu-button::after {
   transform: translateY(5px);
+}
+
+.site-header-menu-button span {
+  display: none;
 }
 
 @media (width <= 980px) {
@@ -127,6 +144,9 @@
   }
 
   .site-header-menu-button {
+    position: absolute;
+    top: 28px;
+    right: var(--page-gutter);
     display: block;
   }
 
@@ -135,13 +155,20 @@
     z-index: 1;
     inset: 0;
     visibility: hidden;
-    padding: 130px var(--page-gutter) 60px;
+    height: 100dvh;
+    min-height: 100svh;
+    padding: calc(102px + env(safe-area-inset-top) + 34px)
+      max(var(--page-gutter), calc(env(safe-area-inset-right) + 18px))
+      max(40px, calc(env(safe-area-inset-bottom) + 24px))
+      max(var(--page-gutter), calc(env(safe-area-inset-left) + 18px));
+    overflow-y: auto;
     flex-direction: column;
     align-items: flex-start;
-    justify-content: center;
-    gap: 20px;
+    justify-content: flex-start;
+    gap: clamp(16px, 3vh, 24px);
     opacity: 0;
     background: var(--brand-ink);
+    overscroll-behavior: contain;
     transform: translateY(-100%);
     transition:
       visibility 500ms ease,
@@ -150,8 +177,24 @@
   }
 
   .site-header-navigation-link {
-    font-size: clamp(2.3rem, 8vw, 5rem);
+    max-width: 100%;
+    font-size: clamp(2.1rem, 8vw, 4.5rem);
     letter-spacing: -0.05em;
+    line-height: 0.95;
+    overflow-wrap: anywhere;
+  }
+
+  .site-header-navigation-cta {
+    display: inline-flex;
+    margin-top: clamp(12px, 3vh, 28px);
+    padding-bottom: 10px;
+    align-items: center;
+    gap: 24px;
+    color: var(--brand-accent);
+    font-size: clamp(0.78rem, 2.5vw, 1rem);
+    letter-spacing: 0.1em;
+    line-height: 1.3;
+    border-bottom: 1px solid currentColor;
   }
 
   .site-header--menu-open .site-header-navigation {
@@ -160,23 +203,44 @@
     transform: translateY(0);
   }
 
-  .site-header--menu-open .site-header-menu-button span:first-child {
+  .site-header--menu-open .site-header-menu-button::before {
     transform: rotate(45deg);
   }
 
-  .site-header--menu-open .site-header-menu-button span:last-child {
+  .site-header--menu-open .site-header-menu-button::after {
     transform: rotate(-45deg);
   }
 }
 
 @media (width <= 600px) {
   .site-header {
-    min-height: 82px;
-    padding-top: 18px;
+    min-height: calc(82px + env(safe-area-inset-top));
+    padding-top: calc(18px + env(safe-area-inset-top));
+    padding-right: max(var(--page-gutter), calc(env(safe-area-inset-right) + 18px));
     padding-bottom: 18px;
+    padding-left: max(var(--page-gutter), calc(env(safe-area-inset-left) + 18px));
   }
 
   .site-header-logo-link {
-    width: 190px;
+    width: clamp(154px, 48vw, 186px);
+  }
+
+  .site-header-menu-button {
+    top: calc(17px + env(safe-area-inset-top));
+    right: max(var(--page-gutter), calc(env(safe-area-inset-right) + 18px));
+    width: 48px;
+    height: 48px;
+  }
+
+  .site-header-navigation {
+    padding-top: calc(82px + env(safe-area-inset-top) + 38px);
+  }
+
+  .site-header-navigation-link {
+    font-size: clamp(2rem, 10vw, 2.7rem);
+  }
+
+  .site-header-navigation-cta {
+    font-size: 0.78rem;
   }
 }

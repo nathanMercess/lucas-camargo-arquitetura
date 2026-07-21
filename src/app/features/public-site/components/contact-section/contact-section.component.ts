@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
-import { ContactChannel } from '../../../../shared/models/contact-channel.model';
+import { ContactSectionConfig } from '../../../../shared/models/contact-section-config.model';
 
 @Component({
   selector: 'app-contact-section',
@@ -9,5 +9,5 @@ import { ContactChannel } from '../../../../shared/models/contact-channel.model'
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ContactSectionComponent {
-  public readonly contactChannels = input.required<readonly ContactChannel[]>();
+  public readonly config = input.required<ContactSectionConfig>();
 }

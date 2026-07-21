@@ -1,11 +1,10 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { FooterLink } from '../../../../shared/models/footer-link.model';
+
+import { DEFAULT_SITE_CONFIG } from '../../../../shared/config/default-site-config';
 import { SiteFooterComponent } from './site-footer.component';
 
 describe('SiteFooterComponent', () => {
   let fixture: ComponentFixture<SiteFooterComponent>;
-
-  const links: readonly FooterLink[] = [{ id: 'projects', label: 'Projetos', href: '#portfolio' }];
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
@@ -13,13 +12,16 @@ describe('SiteFooterComponent', () => {
     }).compileComponents();
 
     fixture = TestBed.createComponent(SiteFooterComponent);
-    fixture.componentRef.setInput('footerLinks', links);
+    fixture.componentRef.setInput('config', DEFAULT_SITE_CONFIG.footer);
+    fixture.componentRef.setInput('uiLabels', DEFAULT_SITE_CONFIG.uiLabels);
+    fixture.componentRef.setInput('logoPath', '/assets/brand/logo-light.png');
     fixture.detectChanges();
   });
 
-  it('should render the configured links', () => {
+  it('should render configured links and statement', () => {
     const compiled = fixture.nativeElement as HTMLElement;
 
-    expect(compiled.querySelector('a')?.textContent).toContain('Projetos');
+    expect(compiled.textContent).toContain('Projetos');
+    expect(compiled.textContent).toContain(DEFAULT_SITE_CONFIG.footer.statement);
   });
 });

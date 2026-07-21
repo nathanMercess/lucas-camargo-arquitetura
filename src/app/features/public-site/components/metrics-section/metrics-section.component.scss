@@ -58,6 +58,11 @@
 }
 
 @media (width <= 680px) {
+  .metrics-section {
+    padding: 72px max(var(--page-gutter), calc(env(safe-area-inset-right) + 18px)) 84px
+      max(var(--page-gutter), calc(env(safe-area-inset-left) + 18px));
+  }
+
   .metrics-section-grid {
     grid-template-columns: 1fr;
   }
@@ -77,10 +82,11 @@
   }
 
   .metrics-section-item strong {
-    font-size: 4.4rem;
+    font-size: clamp(3.35rem, 17vw, 4.2rem);
   }
 
   .metrics-section-item span {
     margin-top: 0;
+    overflow-wrap: anywhere;
   }
 }

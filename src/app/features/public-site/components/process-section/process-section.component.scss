@@ -76,8 +76,15 @@
 }
 
 @media (width <= 680px) {
+  .process-section {
+    padding: 88px max(var(--page-gutter), calc(env(safe-area-inset-right) + 18px)) 94px
+      max(var(--page-gutter), calc(env(safe-area-inset-left) + 18px));
+  }
+
   .process-section h2 {
-    font-size: clamp(2.45rem, 12vw, 4.1rem);
+    font-size: clamp(2.25rem, 10.8vw, 3.75rem);
+    letter-spacing: -0.055em;
+    line-height: 0.98;
   }
 
   .process-section-grid {
@@ -93,5 +100,6 @@
 
   .process-section h3 {
     margin-top: 34px;
+    overflow-wrap: anywhere;
   }
 }

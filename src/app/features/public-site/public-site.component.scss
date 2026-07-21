@@ -45,7 +45,7 @@
 
 .public-site-text-link:hover span,
 .public-site-text-link:focus-visible span {
-  transform: translate(4px, 4px);
+  transform: rotate(var(--public-site-arrow-rotation)) translate(4px, 4px);
 }
 
 .public-site-practice-heading {
@@ -249,33 +249,6 @@
 
   .public-site-about-visual {
     min-height: 65svh;
-  }
-}
-
-@media (width <= 680px) {
-  .public-site-practice h2,
-  .public-site-portfolio h2,
-  .public-site-about h2 {
-    font-size: clamp(2.45rem, 12vw, 4.1rem);
-  }
-
-  .public-site-practice-item {
-    padding: 28px 0;
-    grid-template-columns: 40px 1fr 20px;
-    gap: 10px;
-  }
-
-  .public-site-practice-item p {
-    margin: 12px 0 0 50px;
-    grid-column: 1 / -1;
-  }
-
-  .public-site-about-visual {
-    min-height: 58svh;
-  }
-
-  .public-site-about-visual::before {
-    width: 68vw;
   }
 
 }

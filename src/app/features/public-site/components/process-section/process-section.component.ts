@@ -1,4 +1,6 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input } from '@angular/core';
+
+import { ProcessSectionConfig } from '../../../../shared/models/process-section-config.model';
 
 @Component({
   selector: 'app-process-section',
@@ -7,4 +9,6 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
   styleUrls: ['./process-section.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ProcessSectionComponent {}
+export class ProcessSectionComponent {
+  public readonly config = input.required<ProcessSectionConfig>();
+}

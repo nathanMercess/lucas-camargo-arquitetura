@@ -4,6 +4,7 @@ param(
   [string]$Region = 'us-central1',
   [string]$ServiceName = 'lucas-camargo-site',
   [string]$RepositoryName = 'lucas-camargo',
+  [string]$ContentBaseUrl = '/content',
   [switch]$AllowDirty
 )
 
@@ -61,6 +62,25 @@ if ($LASTEXITCODE -ne 0) {
 
 if ($activeAccounts.Count -ne 1 -or $activeAccounts[0] -ne $authorizedAccount) {
   throw "A única conta ativa deve ser $authorizedAccount. Conta encontrada: $($activeAccounts -join ', ')."
+}
+
+if ($ContentBaseUrl -ne '/content') {
+  [Uri]$parsedContentBaseUrl = $null
+  $isAbsoluteContentUrl = [Uri]::TryCreate($ContentBaseUrl, [UriKind]::Absolute, [ref]$parsedContentBaseUrl)
+  $hasSafeContentUrl = (
+    $isAbsoluteContentUrl -and
+    $parsedContentBaseUrl.Scheme -eq 'https' -and
+    [string]::IsNullOrEmpty($parsedContentBaseUrl.UserInfo) -and
+    [string]::IsNullOrEmpty($parsedContentBaseUrl.Query) -and
+    [string]::IsNullOrEmpty($parsedContentBaseUrl.Fragment) -and
+    $parsedContentBaseUrl.AbsolutePath.TrimEnd('/') -eq '/content'
+  )
+
+  if (-not $hasSafeContentUrl) {
+    throw 'ContentBaseUrl deve ser /content ou uma URL HTTPS sem credenciais, query ou fragmento e terminada em /content.'
+  }
+
+  $ContentBaseUrl = $parsedContentBaseUrl.GetLeftPart([UriPartial]::Path).TrimEnd('/')
 }
 
 Push-Location $repositoryRoot
@@ -172,6 +192,7 @@ try {
     '--cpu-throttling',
     '--no-cpu-boost',
     '--port=8080',
+    "--set-env-vars=CONTENT_BASE_URL=$ContentBaseUrl",
     "--service-account=$runtimeAccountEmail",
     '--labels=environment=production,managed-by=gcloud-script',
     "--account=$authorizedAccount",

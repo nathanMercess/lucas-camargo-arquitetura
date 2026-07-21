@@ -1,14 +1,19 @@
-<section id="contato" class="contact-section" aria-labelledby="contact-title">
-  <p class="contact-section-overline" i18n>Comece uma conversa</p>
-  <h2 id="contact-title" appRevealOnScroll i18n>Seu próximo espaço<br />pode começar <em>agora.</em></h2>
+<section [id]="config().anchor" class="contact-section" [attr.aria-labelledby]="config().id + '-title'">
+  <p class="contact-section-overline">{{ config().overline }}</p>
+  <h2 [id]="config().id + '-title'" appRevealOnScroll><app-rich-text [content]="config().title" /></h2>
 
-  <a class="contact-section-cta" appRevealOnScroll style="--reveal-delay: 90ms"
-    href="mailto:arquiteto@lucascamargo.com?subject=Solicitação%20de%20orçamento" i18n>
-    Solicitar um orçamento <span aria-hidden="true">↗</span>
+  <a class="contact-section-cta" appRevealOnScroll style="--reveal-delay: 90ms" [href]="config().cta.href"
+    [attr.aria-label]="config().cta.ariaLabel ?? config().cta.label"
+    [attr.target]="config().cta.target ?? '_self'"
+    [attr.rel]="config().cta.target === '_blank' ? 'noopener noreferrer' : null">
+    {{ config().cta.label }}
+    <span class="contact-section-cta-icon" aria-hidden="true">
+      <span class="public-site-arrow"></span>
+    </span>
   </a>
 
   <dl class="contact-section-list">
-    @for (channel of contactChannels(); track channel.id; let position = $index) {
+    @for (channel of config().contactChannels; track channel.id; let position = $index) {
       <div class="contact-section-item" appRevealOnScroll [style.--reveal-delay]="position * 80 + 'ms'">
         <dt>{{ channel.label }}</dt>
         <dd>

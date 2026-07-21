@@ -1,8 +1,17 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { RouterModule } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 
+import { DEFAULT_SITE_CONFIG } from '../../../../shared/config/default-site-config';
 import { PortfolioCategory } from '../../../../shared/models/portfolio-category.model';
 import { PortfolioAccordionComponent } from './portfolio-accordion.component';
+
+const portfolioConfig = DEFAULT_SITE_CONFIG.sections.find(
+  (section) => section.type === 'portfolio',
+);
+
+if (!portfolioConfig)
+  throw new Error('A configuração padrão do portfólio é obrigatória.');
 
 describe('PortfolioAccordionComponent', () => {
   let fixture: ComponentFixture<PortfolioAccordionComponent>;
@@ -27,17 +36,20 @@ describe('PortfolioAccordionComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ButtonModule],
+      imports: [ButtonModule, RouterModule.forRoot([])],
       declarations: [PortfolioAccordionComponent],
     }).compileComponents();
 
     fixture = TestBed.createComponent(PortfolioAccordionComponent);
     component = fixture.componentInstance;
+    fixture.componentRef.setInput('config', portfolioConfig);
     fixture.componentRef.setInput('categories', categories);
+    fixture.componentRef.setInput('uiLabels', DEFAULT_SITE_CONFIG.uiLabels);
+    fixture.componentRef.setInput('mediaPaths', {});
     fixture.detectChanges();
   });
 
-  it('should select the first category initially', () => {
+  it('should select the first configured category initially', () => {
     expect(component.activeCategoryId()).toBe('projects');
   });
 

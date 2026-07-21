@@ -5,11 +5,13 @@
 O site não precisa de banco de dados para o conteúdo editorial. A solução proposta usa JSON versionado e imagens no R2, mantendo o Angular apenas como consumidor HTTP.
 
 ```text
-Visitante -> Angular público -> Worker somente leitura -> R2 privado
-Administrador -> Cloud Run Admin protegido por IAP -> R2 privado
+Visitante -> Angular público -> Worker somente leitura -> lucas-camargo-published
+Administrador -> Cloud Run Admin protegido por IAP -> buckets private e published
 ```
 
 Nenhuma chave S3/R2 pode existir no Angular, no repositório ou em variáveis entregues ao navegador.
+
+O Worker ativo é [lucas-camargo-content.nathan66merces.workers.dev](https://lucas-camargo-content.nathan66merces.workers.dev/content/manifest.json). Ele é a única origem pública do conteúdo; os endereços `r2.dev` dos dois buckets estão desativados.
 
 ## Buckets e objetos
 
@@ -32,7 +34,7 @@ lucas-camargo-published
 
 ## Versionamento e publicação
 
-O R2 não implementa o versionamento nativo de buckets do S3. O versionamento será explícito na aplicação:
+O R2 não implementa o versionamento nativo de buckets do S3. O versionamento é explícito na aplicação:
 
 1. gerar um `release-id` único;
 2. gravar `versions/{release-id}/site.json` sem sobrescrever objetos existentes;
@@ -41,6 +43,8 @@ O R2 não implementa o versionamento nativo de buckets do S3. O versionamento se
 5. atualizar `published/manifest.json` usando o ETag anterior;
 6. rejeitar publicação concorrente com `409` ou `412`;
 7. manter o manifest anterior no histórico para rollback.
+
+O manifest contém o caminho, o identificador e o SHA-256 do release. O site só aplica o JSON depois de calcular o hash localmente e confirmar igualdade; um objeto incompleto, alterado ou incompatível é rejeitado e o último conteúdo válido permanece em cache. A troca do manifest é o ponto de commit da publicação. Se uma etapa auxiliar de auditoria falhar depois desse ponto, o histórico reconcilia o release publicado em vez de apresentar um falso erro de publicação.
 
 Política de cache:
 
@@ -55,4 +59,3 @@ Política de cache:
 O R2 Standard possui franquia mensal suficiente para o início do portfólio e não cobra egress. O Worker gratuito atende até 100 mil requisições diárias. Não usar R2 Infrequent Access para os objetos pequenos e consultados frequentemente deste site.
 
 Referências oficiais: [preços do R2](https://developers.cloudflare.com/r2/pricing/), [tokens da API](https://developers.cloudflare.com/r2/api/tokens/), [compatibilidade S3](https://developers.cloudflare.com/r2/api/s3/api/) e [consistência](https://developers.cloudflare.com/r2/reference/consistency/).
-

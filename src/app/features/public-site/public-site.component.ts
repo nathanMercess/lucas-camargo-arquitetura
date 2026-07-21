@@ -10,4 +10,8 @@ import { PublicSiteContentService } from './services/public-site-content.service
 })
 export class PublicSiteComponent {
   public readonly contentService = inject(PublicSiteContentService);
+
+  public constructor() {
+    this.contentService.restoreSiteSeo();
+  }
 }

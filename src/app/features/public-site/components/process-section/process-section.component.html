@@ -1,24 +1,16 @@
-<section class="process-section" aria-labelledby="process-title">
+<section [id]="config().anchor" class="process-section" [attr.aria-labelledby]="config().id + '-title'">
   <header appRevealOnScroll>
-    <p class="process-section-overline" i18n>Processo</p>
-    <h2 id="process-title" i18n>Clareza em cada etapa.</h2>
+    <p class="process-section-overline">{{ config().overline }}</p>
+    <h2 [id]="config().id + '-title'">{{ config().title }}</h2>
   </header>
 
   <div class="process-section-grid">
-    <article appRevealOnScroll>
-      <span>01</span>
-      <h3 i18n>Escuta</h3>
-      <p i18n>Entender objetivos, necessidades e o modo de viver antes do primeiro traço.</p>
-    </article>
-    <article appRevealOnScroll style="--reveal-delay: 90ms">
-      <span>02</span>
-      <h3 i18n>Síntese</h3>
-      <p i18n>Transformar complexidade em uma solução clara, sensível e tecnicamente sólida.</p>
-    </article>
-    <article appRevealOnScroll style="--reveal-delay: 180ms">
-      <span>03</span>
-      <h3 i18n>Construção</h3>
-      <p i18n>Conduzir a execução com cuidado para preservar a intenção e a qualidade.</p>
-    </article>
+    @for (step of config().steps; track step.id; let position = $index) {
+      <article appRevealOnScroll [style.--reveal-delay]="position * 90 + 'ms'">
+        <span>{{ step.index }}</span>
+        <h3>{{ step.title }}</h3>
+        <p>{{ step.description }}</p>
+      </article>
+    }
   </div>
 </section>

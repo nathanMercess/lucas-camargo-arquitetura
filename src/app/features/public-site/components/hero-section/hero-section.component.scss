@@ -20,6 +20,8 @@
 
 .hero-section {
   position: relative;
+  width: 100%;
+  min-width: 0;
   min-height: 100svh;
   overflow: hidden;
   color: var(--brand-surface);
@@ -118,6 +120,7 @@
   text-decoration: none;
   text-transform: uppercase;
   border-bottom: 1px solid currentColor;
+  white-space: normal;
 }
 
 .hero-section-portfolio-link span {
@@ -127,7 +130,7 @@
 
 .hero-section-portfolio-link:hover span,
 .hero-section-portfolio-link:focus-visible span {
-  transform: translate(4px, 4px);
+  transform: rotate(var(--public-site-arrow-rotation)) translate(4px, 4px);
 }
 
 .hero-section-index {
@@ -147,7 +150,7 @@
   position: absolute;
   z-index: 2;
   top: 50%;
-  right: calc(var(--page-gutter) - 68px);
+  right: max(8px, calc(var(--page-gutter) - 68px));
   margin: 0;
   font-family: var(--font-data);
   font-size: 0.66rem;
@@ -212,15 +215,24 @@
 }
 
 @media (width <= 680px) {
+  .hero-section {
+    min-height: max(100svh, 620px);
+  }
+
   .hero-section-content {
     width: 100%;
-    padding-top: 140px;
-    padding-bottom: 58px;
+    min-height: max(100svh, 620px);
+    padding: calc(122px + env(safe-area-inset-top))
+      max(var(--page-gutter), calc(env(safe-area-inset-right) + 18px))
+      max(42px, calc(env(safe-area-inset-bottom) + 30px))
+      max(var(--page-gutter), calc(env(safe-area-inset-left) + 18px));
   }
 
   .hero-section h1 {
-    font-size: clamp(3.25rem, 15vw, 5.5rem);
-    line-height: 0.86;
+    max-width: 100%;
+    font-size: clamp(2.25rem, 11.2vw, 3.75rem);
+    letter-spacing: -0.065em;
+    line-height: 0.88;
   }
 
   .hero-section h1 em {
@@ -228,13 +240,29 @@
   }
 
   .hero-section-bottom {
+    width: 100%;
     align-items: start;
     flex-direction: column;
-    gap: 32px;
+    gap: 28px;
+  }
+
+  .hero-section-portfolio-link {
+    max-width: 100%;
+    gap: clamp(24px, 9vw, 42px);
   }
 
   .hero-section-index,
   .hero-section-caption {
     display: none;
+  }
+}
+
+@media (width <= 360px) {
+  .hero-section-content {
+    padding-top: calc(112px + env(safe-area-inset-top));
+  }
+
+  .hero-section-overline {
+    font-size: 0.63rem;
   }
 }

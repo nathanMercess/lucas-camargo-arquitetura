@@ -87,5 +87,22 @@ if (this.isAutoRotationPaused() || this.isPointerInteractionPaused())
 - Usar a paleta, tipografia, proporções e versões aprovadas do logo.
 - Não inclinar, reorganizar, contornar ou recolorir a marca fora das versões aprovadas.
 - Usar imagens com cantos de 90 graus e evitar sombras ou bordas decorativas não previstas.
+- Não usar emojis ou caracteres Unicode como ícones de interface. Usar PrimeIcons quando compatível ou ícones em CSS/SVG coerentes com a identidade visual.
+- Validar toda alteração visual nas larguras de 320, 375, 390 e 430 pixels, sem rolagem horizontal, recortes ou sobreposições, incluindo as áreas seguras do iOS.
 - Respeitar `prefers-reduced-motion` em animações e transições.
 - Não substituir projetos, obras ou fotografias reais por trabalhos fictícios.
+
+## 8. Conteúdo dinâmico e administração
+
+- Tratar `SiteConfigV1` como contrato único entre site público, painel, API e armazenamento.
+- Manter textos editoriais, mídias, SEO, navegação, ordem, visibilidade, tema permitido, categorias, projetos e galerias administráveis em runtime; não espalhar esse conteúdo como constantes em componentes.
+- Usar a configuração local somente como fallback seguro e como bootstrap do primeiro rascunho.
+- Versionar qualquer alteração incompatível do schema e preservar leitura segura de publicações anteriores.
+- Não permitir HTML, CSS ou JavaScript arbitrários no conteúdo administrável.
+- Validar o documento completo e suas relações tanto no frontend quanto na API antes de publicar.
+- Exigir ETag em alterações de rascunho, publicação e rollback para impedir sobrescrita concorrente silenciosa.
+- Registrar toda mutação administrativa com ator, ação, recurso, request ID, resultado e hashes ou ETags relevantes, sem registrar tokens ou o conteúdo integral.
+- Manter buckets privados; credenciais R2 pertencem exclusivamente à API e nunca podem chegar ao Angular, ao Git ou aos logs.
+- Proteger o painel e a API com IAP, autorização no backend, origem exata e defesa CSRF. Ocultar um controle na interface não substitui a autorização da API.
+- Publicar releases e mídias em chaves imutáveis e trocar somente o manifest por escrita condicional, mantendo rollback verificável.
+- Uma nova variação de conteúdo deve reutilizar o catálogo tipado existente quando possível. Um comportamento visual realmente novo exige implementação, teste e revisão de código.

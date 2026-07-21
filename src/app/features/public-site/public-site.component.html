@@ -1,69 +1,104 @@
 <div class="public-site-shell">
-  <app-hero-section [navigationItems]="contentService.navigationItems()" />
-
   <main id="conteudo">
-    <app-manifesto-section />
-
-    <section id="atuacao" class="public-site-practice" aria-labelledby="practice-title">
-      <header class="public-site-practice-heading">
-        <p class="public-site-section-index" i18n>02 / O que fazemos</p>
-        <div appRevealOnScroll>
-          <p class="public-site-overline" i18n>Escopo integrado</p>
-          <h2 id="practice-title" i18n>Da ideia à obra.<br />Uma visão, um cuidado.</h2>
-        </div>
-      </header>
-
-      <div class="public-site-practice-list">
-        @for (practice of contentService.practiceAreas(); track practice.id; let position = $index) {
-          <article class="public-site-practice-item" appRevealOnScroll
-            [style.--reveal-delay]="position * 90 + 'ms'">
-            <span>{{ practice.index }}</span>
-            <h3>{{ practice.title }}</h3>
-            <p>{{ practice.description }}</p>
-            <span aria-hidden="true">↗</span>
-          </article>
+    @for (section of contentService.visibleSections(); track section.id) {
+      @switch (section.type) {
+        @case ('hero') {
+          <app-hero-section [config]="section" [headerConfig]="contentService.config().header"
+            [navigationItems]="contentService.navigationItems()" [uiLabels]="contentService.config().uiLabels"
+            [backgroundPath]="contentService.resolveMediaPath(section.background.assetId)"
+            [logoPath]="contentService.resolveMediaPath(contentService.config().header.logo.assetId)"
+            [skipTarget]="contentService.firstContentAnchor()" />
         }
-      </div>
-    </section>
+        @case ('manifesto') {
+          <app-manifesto-section [config]="section" />
+        }
+        @case ('practice') {
+          <section [id]="section.anchor" class="public-site-practice"
+            [attr.aria-labelledby]="section.id + '-title'">
+            <header class="public-site-practice-heading">
+              <p class="public-site-section-index">{{ section.indexLabel }}</p>
+              <div appRevealOnScroll>
+                <p class="public-site-overline">{{ section.overline }}</p>
+                <h2 [id]="section.id + '-title'"><app-rich-text [content]="section.title" /></h2>
+              </div>
+            </header>
 
-    <section id="portfolio" class="public-site-portfolio" aria-labelledby="portfolio-title">
-      <header class="public-site-portfolio-heading">
-        <p class="public-site-overline" i18n>Portfólio / categorias</p>
-        <h2 id="portfolio-title" appRevealOnScroll i18n>Duas escalas.<br /><em>O mesmo rigor.</em></h2>
-        <p appRevealOnScroll style="--reveal-delay: 100ms" i18n>
-          Explore projetos e obras pela transição horizontal definida nas referências do site.
-          As fotografias exibidas nesta versão são referências visuais até a entrada do acervo autoral.
-        </p>
-      </header>
+            <div class="public-site-practice-list">
+              @for (practice of section.practiceAreas; track practice.id; let position = $index) {
+                <article class="public-site-practice-item" appRevealOnScroll
+                  [style.--reveal-delay]="position * 90 + 'ms'">
+                  <span>{{ practice.index }}</span>
+                  <h3>{{ practice.title }}</h3>
+                  <p>{{ practice.description }}</p>
+                  <span class="public-site-arrow" aria-hidden="true"></span>
+                </article>
+              }
+            </div>
+          </section>
+        }
+        @case ('portfolio') {
+          <section [id]="section.anchor" class="public-site-portfolio"
+            [attr.aria-labelledby]="section.id + '-title'">
+            <header class="public-site-portfolio-heading">
+              <p class="public-site-overline">{{ section.overline }}</p>
+              <h2 [id]="section.id + '-title'" appRevealOnScroll>
+                <app-rich-text [content]="section.title" />
+              </h2>
+              @for (paragraph of section.description; track paragraph; let position = $index) {
+                <p appRevealOnScroll [style.--reveal-delay]="position * 100 + 100 + 'ms'">
+                  {{ paragraph }}
+                </p>
+              }
+            </header>
 
-      <app-portfolio-accordion appRevealOnScroll [categories]="contentService.portfolioCategories()" />
-    </section>
+            <app-portfolio-accordion appRevealOnScroll [config]="section"
+              [categories]="contentService.portfolioCategories()" [uiLabels]="contentService.config().uiLabels"
+              [mediaPaths]="contentService.mediaPaths()" />
+          </section>
+        }
+        @case ('metrics') {
+          <app-metrics-section [config]="section" />
+        }
+        @case ('about') {
+          <section [id]="section.anchor" class="public-site-about"
+            [attr.aria-labelledby]="section.id + '-title'">
+            <div class="public-site-about-visual" role="img" [attr.aria-label]="section.portraitAriaLabel"
+              appRevealOnScroll>
+              <img [src]="contentService.resolveMediaPath(section.portrait.assetId)"
+                [alt]="section.portrait.decorative ? '' : section.portrait.alt"
+                [attr.aria-hidden]="section.portrait.decorative"
+                [style.object-position]="section.portrait.focalPointX + '% ' + section.portrait.focalPointY + '%'" />
+              @if (section.portrait.caption; as caption) {
+                <span>{{ caption }}</span>
+              }
+            </div>
 
-    <app-metrics-section [metrics]="contentService.metrics()" />
-
-    <section id="sobre" class="public-site-about" aria-labelledby="about-title">
-      <div class="public-site-about-visual" role="img" aria-label="Retrato de Lucas Camargo em atualização"
-        appRevealOnScroll i18n-aria-label>
-        <img src="assets/brand/logo-light.png" alt="" />
-        <span i18n>Retrato em atualização</span>
-      </div>
-
-      <div class="public-site-about-content" appRevealOnScroll style="--reveal-delay: 100ms">
-        <p class="public-site-overline">
-          {{ contentService.profile().name }} / {{ contentService.profile().professionalTitle }}
-        </p>
-        <h2 id="about-title" i18n>Rigor técnico.<br /><em>Sensibilidade humana.</em></h2>
-        <p class="public-site-about-biography">{{ contentService.profile().biography }}</p>
-        <a class="public-site-text-link" href="#contato" i18n>
-          Iniciar uma conversa <span aria-hidden="true">↘</span>
-        </a>
-      </div>
-    </section>
-
-    <app-process-section />
-
-    <app-contact-section [contactChannels]="contentService.contactChannels()" />
+            <div class="public-site-about-content" appRevealOnScroll style="--reveal-delay: 100ms">
+              <p class="public-site-overline">
+                {{ section.profile.name }} / {{ section.profile.professionalTitle }}
+              </p>
+              <h2 [id]="section.id + '-title'"><app-rich-text [content]="section.title" /></h2>
+              <p class="public-site-about-biography">{{ section.profile.biography }}</p>
+              <a class="public-site-text-link" [href]="section.link.href"
+                [attr.aria-label]="section.link.ariaLabel ?? section.link.label"
+                [attr.target]="section.link.target ?? '_self'"
+                [attr.rel]="section.link.target === '_blank' ? 'noopener noreferrer' : null">
+                {{ section.link.label }}
+                <span class="public-site-arrow public-site-arrow--south-east" aria-hidden="true"></span>
+              </a>
+            </div>
+          </section>
+        }
+        @case ('process') {
+          <app-process-section [config]="section" />
+        }
+        @case ('contact') {
+          <app-contact-section [config]="section" />
+        }
+      }
+    }
   </main>
 
-  <app-site-footer [footerLinks]="contentService.footerLinks()" />
+  <app-site-footer [config]="contentService.config().footer" [uiLabels]="contentService.config().uiLabels"
+    [logoPath]="contentService.resolveMediaPath(contentService.config().footer.logo.assetId)" />
 </div>

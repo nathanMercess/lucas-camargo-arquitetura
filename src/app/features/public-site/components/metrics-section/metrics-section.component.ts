@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 
-import { Metric } from '../../../../shared/models/metric.model';
+import { MetricsSectionConfig } from '../../../../shared/models/metrics-section-config.model';
 
 @Component({
   selector: 'app-metrics-section',
@@ -10,5 +10,5 @@ import { Metric } from '../../../../shared/models/metric.model';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MetricsSectionComponent {
-  readonly metrics = input.required<readonly Metric[]>();
+  public readonly config = input.required<MetricsSectionConfig>();
 }

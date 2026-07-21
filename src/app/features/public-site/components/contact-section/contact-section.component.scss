@@ -51,7 +51,7 @@
   border-bottom: 1px solid var(--brand-ink);
 }
 
-.contact-section-cta span {
+.contact-section-cta-icon {
   display: grid;
   width: 56px;
   height: 56px;
@@ -64,8 +64,8 @@
     transform 500ms var(--ease-smooth);
 }
 
-.contact-section-cta:hover span,
-.contact-section-cta:focus-visible span {
+.contact-section-cta:hover > .contact-section-cta-icon,
+.contact-section-cta:focus-visible > .contact-section-cta-icon {
   transform: rotate(45deg);
   background: var(--brand-ink);
 }
@@ -95,6 +95,7 @@
 .contact-section-item dd {
   margin: 0;
   font-size: clamp(0.9rem, 1.3vw, 1.2rem);
+  overflow-wrap: anywhere;
 }
 
 .contact-section-item a {
@@ -108,13 +109,28 @@
 }
 
 @media (width <= 680px) {
+  .contact-section {
+    padding: 88px max(var(--page-gutter), calc(env(safe-area-inset-right) + 18px))
+      max(58px, calc(env(safe-area-inset-bottom) + 36px))
+      max(var(--page-gutter), calc(env(safe-area-inset-left) + 18px));
+  }
+
   .contact-section h2 {
-    font-size: clamp(3rem, 13vw, 4.5rem);
+    font-size: clamp(2.3rem, 10.8vw, 3.85rem);
+    letter-spacing: -0.055em;
+    line-height: 0.96;
   }
 
   .contact-section-cta {
     margin: 65px 0 95px;
+    gap: 20px;
     font-size: 1.05rem;
+  }
+
+  .contact-section-cta-icon {
+    width: 46px;
+    height: 46px;
+    flex: 0 0 46px;
   }
 
   .contact-section-list {

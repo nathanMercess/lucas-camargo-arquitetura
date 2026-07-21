@@ -1,32 +1,32 @@
 <div class="portfolio-accordion" (mouseenter)="setPointerInteractionPaused(true)"
   (mouseleave)="setPointerInteractionPaused(false)" (focusin)="setPointerInteractionPaused(true)"
   (focusout)="setPointerInteractionPaused(false)">
-  @for (category of categories(); track category.id) {
-    <button pButton type="button" class="portfolio-accordion-panel" [class]="category.visualClass"
+  @for (category of visibleCategories(); track category.id) {
+    <a pButton class="portfolio-accordion-panel" [class]="category.visualClass"
+      [style.background-image]="backgroundImage(category)"
       [class.portfolio-accordion-panel--active]="activeCategoryId() === category.id"
-      [attr.aria-pressed]="activeCategoryId() === category.id"
-      [attr.aria-label]="'Selecionar a categoria ' + category.title"
+      [attr.aria-current]="activeCategoryId() === category.id ? 'true' : null" [attr.aria-label]="category.title"
+      [routerLink]="['/portfolio/categoria', category.id]"
       (mouseenter)="selectCategory(category.id)" (focus)="selectCategory(category.id)"
       (click)="selectCategory(category.id)">
       <span class="portfolio-accordion-panel-overlay" aria-hidden="true"></span>
       <span class="portfolio-accordion-panel-index">{{ category.index }}</span>
-      <span class="portfolio-accordion-panel-reference" i18n>Imagem de referência</span>
+      <span class="portfolio-accordion-panel-reference">{{ uiLabels().referenceImage }}</span>
       <span class="portfolio-accordion-panel-title">{{ category.title }}</span>
       <span class="portfolio-accordion-panel-content">
         <span class="portfolio-accordion-panel-description">{{ category.description }}</span>
-        <span class="portfolio-accordion-panel-action" i18n>Explorar categoria <b aria-hidden="true">↗</b></span>
+        <span class="portfolio-accordion-panel-action">
+          {{ uiLabels().exploreCategory }}
+          <b class="public-site-arrow" aria-hidden="true"></b>
+        </span>
       </span>
-    </button>
+    </a>
   }
 
-  <button pButton class="portfolio-accordion-motion-control" type="button"
-    [attr.aria-label]="isAutoRotationPaused() ? 'Retomar animação do portfólio' : 'Pausar animação do portfólio'"
-    (click)="toggleAutoRotation()">
-    <span aria-hidden="true">{{ isAutoRotationPaused() ? '▶' : 'Ⅱ' }}</span>
-    @if (isAutoRotationPaused()) {
-      <span i18n>Retomar</span>
-    } @else {
-      <span i18n>Pausar</span>
-    }
-  </button>
+  @if (config().autoRotationEnabled) {
+    <button pButton class="portfolio-accordion-motion-control" type="button"
+      [attr.aria-label]="motionControlLabel()" (click)="toggleAutoRotation()">
+      <span>{{ motionControlText() }}</span>
+    </button>
+  }
 </div>

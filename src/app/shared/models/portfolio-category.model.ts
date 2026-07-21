@@ -4,4 +4,5 @@ export interface PortfolioCategory {
   readonly title: string;
   readonly description: string;
   readonly visualClass: string;
+  readonly coverMediaId?: string;
 }

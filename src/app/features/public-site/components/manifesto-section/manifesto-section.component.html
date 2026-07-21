@@ -1,16 +1,17 @@
-<section class="manifesto-section" aria-labelledby="manifesto-title">
-  <p class="manifesto-section-index" i18n>01 / Essência</p>
+<section [id]="config().anchor" class="manifesto-section" [attr.aria-labelledby]="config().id + '-title'">
+  <p class="manifesto-section-index">{{ config().indexLabel }}</p>
   <div class="manifesto-section-content">
-    <h2 id="manifesto-title" appRevealOnScroll i18n>
-      Projetar é retirar o excesso até restar o <em>essencial.</em>
-    </h2>
+    <h2 [id]="config().id + '-title'" appRevealOnScroll><app-rich-text [content]="config().title" /></h2>
     <div class="manifesto-section-note" appRevealOnScroll style="--reveal-delay: 100ms">
-      <p i18n>
-        Arquitetura nasce de escuta. Objetivos, rotinas e sonhos são traduzidos em espaços
-        precisos, honestos e feitos para atravessar o tempo.
-      </p>
-      <a class="manifesto-section-link" href="#sobre" i18n>
-        Conheça o estúdio <span aria-hidden="true">↘</span>
+      @for (paragraph of config().body; track paragraph) {
+        <p>{{ paragraph }}</p>
+      }
+      <a class="manifesto-section-link" [href]="config().link.href"
+        [attr.aria-label]="config().link.ariaLabel ?? config().link.label"
+        [attr.target]="config().link.target ?? '_self'"
+        [attr.rel]="config().link.target === '_blank' ? 'noopener noreferrer' : null">
+        {{ config().link.label }}
+        <span class="public-site-arrow public-site-arrow--south-east" aria-hidden="true"></span>
       </a>
     </div>
   </div>

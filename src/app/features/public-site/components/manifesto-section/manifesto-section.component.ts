@@ -1,4 +1,6 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input } from '@angular/core';
+
+import { ManifestoSectionConfig } from '../../../../shared/models/manifesto-section-config.model';
 
 @Component({
   selector: 'app-manifesto-section',
@@ -7,4 +9,6 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
   styleUrls: ['./manifesto-section.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ManifestoSectionComponent {}
+export class ManifestoSectionComponent {
+  public readonly config = input.required<ManifestoSectionConfig>();
+}

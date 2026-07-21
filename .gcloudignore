@@ -3,6 +3,10 @@
 .github
 .idea
 .vscode
+.env
+.env.*
+gha-creds-*.json
+cloudflare
 coverage
 dist
 docs
@@ -10,4 +14,3 @@ node_modules
 __screenshots__
 *.log
 *.md
-
