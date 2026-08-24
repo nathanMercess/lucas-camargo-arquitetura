@@ -12,7 +12,9 @@
     "verify:content": "node scripts/verify-content-manifest.mjs",
     "check": "yarn run verify:content && yarn lint && yarn test && yarn build",
     "check:worker": "yarn --cwd cloudflare/content-worker install --frozen-lockfile --non-interactive && yarn --cwd cloudflare/content-worker run check",
-    "check:all": "yarn run check && yarn run check:worker"
+    "check:contact-worker": "yarn --cwd cloudflare/contact-worker install --frozen-lockfile --non-interactive && yarn --cwd cloudflare/contact-worker run check",
+    "check:workers": "yarn run check:worker && yarn run check:contact-worker",
+    "check:all": "yarn run check && yarn run check:workers"
   },
   "private": true,
   "packageManager": "yarn@1.22.22",

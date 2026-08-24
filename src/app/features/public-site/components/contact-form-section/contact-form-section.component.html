@@ -1,0 +1,97 @@
+<section [id]="config().anchor" class="contact-form-section"
+  [attr.aria-labelledby]="config().id + '-title'">
+  <header class="contact-form-section-header" appRevealOnScroll>
+    <p class="contact-form-section-overline">{{ config().overline }}</p>
+    <h2 [id]="config().id + '-title'"><app-rich-text [content]="config().title" /></h2>
+    @for (paragraph of config().description; track paragraph) {
+      <p class="contact-form-section-description">{{ paragraph }}</p>
+    }
+  </header>
+
+  <form class="contact-form" [formGroup]="form" (ngSubmit)="submit()" novalidate appRevealOnScroll
+    [attr.aria-disabled]="!isAvailable()">
+    <div class="contact-form-field">
+      <label [for]="config().id + '-name'">{{ config().nameLabel }}</label>
+      <input [id]="config().id + '-name'" type="text" formControlName="name" autocomplete="name"
+        required minlength="2" maxlength="120"
+        [attr.aria-invalid]="hasError('name')" [attr.aria-describedby]="config().id + '-name-error'" />
+      @if (hasError('name')) {
+        <span [id]="config().id + '-name-error'" class="contact-form-error" i18n>Informe seu nome.</span>
+      }
+    </div>
+
+    <div class="contact-form-field">
+      <label [for]="config().id + '-email'">{{ config().emailLabel }}</label>
+      <input [id]="config().id + '-email'" type="email" formControlName="email" autocomplete="email"
+        required maxlength="254"
+        [attr.aria-invalid]="hasError('email')" [attr.aria-describedby]="config().id + '-email-error'" />
+      @if (hasError('email')) {
+        <span [id]="config().id + '-email-error'" class="contact-form-error" i18n>Informe um e-mail válido.</span>
+      }
+    </div>
+
+    <div class="contact-form-field">
+      <label [for]="config().id + '-phone'">{{ config().phoneLabel }}</label>
+      <input [id]="config().id + '-phone'" type="tel" formControlName="phone" autocomplete="tel"
+        required maxlength="30"
+        [attr.aria-invalid]="hasError('phone')" [attr.aria-describedby]="config().id + '-phone-error'" />
+      @if (hasError('phone')) {
+        <span [id]="config().id + '-phone-error'" class="contact-form-error" i18n>Informe um telefone válido.</span>
+      }
+    </div>
+
+    <div class="contact-form-field">
+      <label [for]="config().id + '-subject'">{{ config().subjectLabel }}</label>
+      <input [id]="config().id + '-subject'" type="text" formControlName="subject"
+        required minlength="3" maxlength="160"
+        [attr.aria-invalid]="hasError('subject')"
+        [attr.aria-describedby]="config().id + '-subject-error'" />
+      @if (hasError('subject')) {
+        <span [id]="config().id + '-subject-error'" class="contact-form-error" i18n>Informe o assunto.</span>
+      }
+    </div>
+
+    <div class="contact-form-field contact-form-field--message">
+      <label [for]="config().id + '-message'">{{ config().messageLabel }}</label>
+      <textarea [id]="config().id + '-message'" formControlName="message" rows="7"
+        required minlength="10" maxlength="4000"
+        [attr.aria-invalid]="hasError('message')"
+        [attr.aria-describedby]="config().id + '-message-error'"></textarea>
+      @if (hasError('message')) {
+        <span [id]="config().id + '-message-error'" class="contact-form-error" i18n>Escreva sua mensagem.</span>
+      }
+    </div>
+
+    <div class="contact-form-honeypot">
+      <label [for]="config().id + '-website'">Website</label>
+      <input [id]="config().id + '-website'" type="text" formControlName="website" autocomplete="off"
+        tabindex="-1" />
+    </div>
+
+    <p class="contact-form-privacy">{{ config().privacyNotice }}</p>
+    @if (isAvailable()) {
+      <div #turnstileContainer class="contact-form-turnstile"></div>
+    } @else {
+      <div #turnstileContainer class="contact-form-unavailable" role="status">
+        <p i18n>O formulário está temporariamente indisponível. Use os canais de contato informados na página.</p>
+      </div>
+    }
+
+    <button pButton class="contact-form-submit" type="submit" [disabled]="form.invalid || !canSubmit()">
+      @if (isSubmitting()) {
+        <span i18n>Enviando...</span>
+      } @else {
+        <span>{{ config().submitLabel }}</span>
+      }
+    </button>
+
+    <div class="contact-form-status" aria-live="polite">
+      @if (submitSucceeded()) {
+        <p class="contact-form-status--success">{{ config().successMessage }}</p>
+      }
+      @if (submitFailed()) {
+        <p class="contact-form-status--error">{{ config().errorMessage }}</p>
+      }
+    </div>
+  </form>
+</section>

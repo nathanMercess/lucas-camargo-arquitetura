@@ -1,0 +1,99 @@
+:host {
+  display: block;
+}
+
+.whatsapp-cta-section {
+  padding: clamp(90px, 12vw, 180px) var(--page-gutter);
+  color: var(--brand-surface);
+  background: var(--brand-ink);
+}
+
+.whatsapp-cta-section-overline {
+  margin: 0 0 clamp(46px, 7vw, 90px);
+  font-family: var(--font-data);
+  font-size: 0.7rem;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+}
+
+.whatsapp-cta-section-overline::before {
+  display: inline-block;
+  width: 34px;
+  height: 2px;
+  margin: 0 12px 3px 0;
+  background: var(--brand-accent);
+  content: '';
+}
+
+.whatsapp-cta-section-content {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(260px, 0.6fr);
+  align-items: end;
+  gap: clamp(44px, 8vw, 140px);
+}
+
+.whatsapp-cta-section h2 {
+  margin: 0;
+  font-size: clamp(2.8rem, 6.8vw, 8rem);
+  letter-spacing: -0.07em;
+  line-height: 0.92;
+  text-transform: uppercase;
+  overflow-wrap: anywhere;
+}
+
+.whatsapp-cta-section h2 em {
+  color: var(--brand-accent);
+  font-style: normal;
+}
+
+.whatsapp-cta-section-copy p {
+  margin: 0 0 18px;
+  color: rgb(255 255 255 / 68%);
+  line-height: 1.7;
+}
+
+.whatsapp-cta-section-copy a {
+  display: inline-flex;
+  width: fit-content;
+  margin-top: 28px;
+  padding-bottom: 9px;
+  align-items: center;
+  gap: 28px;
+  color: inherit;
+  font-family: var(--font-data);
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  text-decoration: none;
+  text-transform: uppercase;
+  border-bottom: 1px solid currentColor;
+}
+
+.whatsapp-cta-section-copy a .public-site-arrow {
+  transition: transform 250ms ease;
+}
+
+.whatsapp-cta-section-copy a:hover .public-site-arrow,
+.whatsapp-cta-section-copy a:focus-visible .public-site-arrow {
+  transform: translate(4px, -4px) rotate(var(--public-site-arrow-rotation));
+}
+
+@media (width <= 760px) {
+  .whatsapp-cta-section {
+    padding-right: max(var(--page-gutter), calc(env(safe-area-inset-right) + 18px));
+    padding-left: max(var(--page-gutter), calc(env(safe-area-inset-left) + 18px));
+  }
+
+  .whatsapp-cta-section-content {
+    grid-template-columns: 1fr;
+  }
+
+  .whatsapp-cta-section h2 {
+    font-size: clamp(2.45rem, 12vw, 4.2rem);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .whatsapp-cta-section-copy a .public-site-arrow {
+    transition: none;
+  }
+}

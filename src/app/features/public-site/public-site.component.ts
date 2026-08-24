@@ -11,8 +11,12 @@ import { PublicSiteContentService } from './services/public-site-content.service
 export class PublicSiteComponent {
   public readonly contentService = inject(PublicSiteContentService);
   public readonly visualBuilderDocument = computed(() => {
-    const document = this.contentService.config().visualBuilder;
-    return document?.enabled ? document : null;
+    const config = this.contentService.config();
+
+    if (config.schemaVersion !== 1)
+      return null;
+
+    return config.visualBuilder?.enabled ? config.visualBuilder : null;
   });
 
   public constructor() {

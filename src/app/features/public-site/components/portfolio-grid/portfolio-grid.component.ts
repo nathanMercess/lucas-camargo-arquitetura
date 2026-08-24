@@ -21,6 +21,8 @@ export class PortfolioGridComponent {
 
   public readonly mediaPaths = input.required<Readonly<Record<string, string>>>();
 
+  public readonly maxColumns = input<number | null>(null);
+
   public readonly cards = computed<PortfolioProjectCard[]>(() => {
     const assetsById = new Map(this.mediaAssets().map((asset) => [asset.id, asset]));
     const categoriesById = new Map(this.categories().map((category) => [category.id, category]));

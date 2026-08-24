@@ -1,0 +1,56 @@
+@if (resolvedPage(); as currentPage) {
+  @if (!firstSectionIsHero()) {
+    <a class="configurable-page-skip-link" href="#conteudo">
+      {{ contentService.config().uiLabels.skipToContent }}
+    </a>
+    <app-site-header [config]="contentService.config().header"
+      [navigationItems]="contentService.navigationItems()" [uiLabels]="contentService.config().uiLabels"
+      [logoPath]="contentService.resolveMediaPath(contentService.config().header.logo.assetId)" />
+  }
+
+  <main id="conteudo">
+    @for (section of sections(); track section.id; let position = $index) {
+      @switch (section.type) {
+        @case ('hero') {
+          <app-hero-section [config]="section" [headerConfig]="contentService.config().header"
+            [navigationItems]="contentService.navigationItems()" [uiLabels]="contentService.config().uiLabels"
+            [backgroundPath]="contentService.resolveMediaPath(section.background.assetId)"
+            [logoPath]="contentService.resolveMediaPath(contentService.config().header.logo.assetId)"
+            [skipTarget]="firstContentAnchor()" [showHeader]="position === 0" [showSkipLink]="position === 0" />
+        }
+        @case ('project-grid') {
+          <section [id]="section.anchor" class="configurable-page-projects"
+            [attr.aria-labelledby]="section.id + '-title'">
+            <header appRevealOnScroll>
+              <p>{{ section.overline }}</p>
+              <h2 [id]="section.id + '-title'"><app-rich-text [content]="section.title" /></h2>
+              @for (paragraph of section.description; track paragraph) {
+                <p class="configurable-page-projects-description">{{ paragraph }}</p>
+              }
+            </header>
+            <app-portfolio-grid [projects]="projectsFor(section.projectIds)"
+              [categories]="contentService.portfolioCategories()" [mediaAssets]="contentService.config().media"
+              [mediaPaths]="contentService.mediaPaths()" [maxColumns]="section.maxColumns" />
+          </section>
+        }
+        @case ('whatsapp-cta') {
+          @if (siteContact(); as contact) {
+            <app-whatsapp-cta-section [config]="section" [contact]="contact" />
+          }
+        }
+        @case ('contact-form') {
+          <app-contact-form-section [config]="section" />
+        }
+      }
+    }
+  </main>
+
+  <app-site-footer [config]="contentService.config().footer" [uiLabels]="contentService.config().uiLabels"
+    [logoPath]="contentService.resolveMediaPath(contentService.config().footer.logo.assetId)" />
+} @else if (contentService.isLoading()) {
+  <section class="configurable-page-loading" role="status" aria-live="polite">
+    <p i18n>Carregando página.</p>
+  </section>
+} @else {
+  <app-not-found />
+}

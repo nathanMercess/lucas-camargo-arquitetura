@@ -1,4 +1,14 @@
-@if (visualBuilderDocument(); as visualBuilder) {
+@if (contentService.config().schemaVersion === 2) {
+  @if (contentService.homePage(); as homePage) {
+    <app-configurable-page [page]="homePage" />
+  } @else if (contentService.isLoading()) {
+    <section role="status" aria-live="polite">
+      <p i18n>Carregando página inicial.</p>
+    </section>
+  } @else {
+    <app-not-found />
+  }
+} @else if (visualBuilderDocument(); as visualBuilder) {
   <app-custom-page-renderer [document]="visualBuilder" />
 } @else {
 <div class="public-site-shell">

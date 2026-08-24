@@ -2,6 +2,9 @@ import { Injectable } from '@angular/core';
 
 import { PublishedManifestV1 } from '../../../shared/models/published-manifest-v1.model';
 import { SiteConfigV1 } from '../../../shared/models/site-config-v1.model';
+import { SiteConfigV2 } from '../../../shared/models/site-config-v2.model';
+import { SiteDocument } from '../../../shared/models/site-document.model';
+import { SitePageV2 } from '../../../shared/models/site-page-v2.model';
 
 @Injectable({
   providedIn: 'root',
@@ -59,6 +62,47 @@ export class SiteConfigValidatorService {
       return false;
 
     return this.hasValidRelationships(value as unknown as SiteConfigV1);
+  }
+
+  public isSiteConfigV2(value: unknown): value is SiteConfigV2 {
+    if (!this.isRecord(value) || value['schemaVersion'] !== 2)
+      return false;
+
+    if (
+      !this.isNonEmptyString(value['releaseId']) ||
+      !this.isIsoDate(value['publishedAt']) ||
+      value['locale'] !== 'pt-BR'
+    )
+      return false;
+
+    if (
+      !this.isIdentity(value['identity']) ||
+      !this.isSeo(value['seo']) ||
+      !this.isTheme(value['theme']) ||
+      !this.isUiLabels(value['uiLabels']) ||
+      !this.isHeader(value['header']) ||
+      !this.isFooter(value['footer']) ||
+      !this.isSiteContact(value['contact'])
+    )
+      return false;
+
+    if (this.ownsProperty(value, 'sections') || this.ownsProperty(value, 'visualBuilder'))
+      return false;
+
+    if (
+      !this.isArrayOf(value['media'], (item) => this.isMediaAsset(item)) ||
+      !this.isArrayOf(value['navigationItems'], (item) => this.isNavigationItem(item)) ||
+      !this.isArrayOf(value['portfolioCategories'], (item) => this.isPortfolioCategory(item)) ||
+      !this.isArrayOf(value['projects'], (item) => this.isPortfolioProject(item)) ||
+      !this.isArrayOf(value['pages'], (item) => this.isSitePageV2(item))
+    )
+      return false;
+
+    return this.hasValidV2Relationships(value as unknown as SiteConfigV2);
+  }
+
+  public isSiteDocument(value: unknown): value is SiteDocument {
+    return this.isSiteConfigV1(value) || this.isSiteConfigV2(value);
   }
 
   private isIdentity(value: unknown): boolean {
@@ -378,6 +422,39 @@ export class SiteConfigValidatorService {
     }
   }
 
+  private isSitePageV2(value: unknown): value is SitePageV2 {
+    if (!this.isRecord(value))
+      return false;
+
+    return (
+      this.isId(value['id']) &&
+      this.isId(value['slug']) &&
+      this.isSafePagePath(value['path']) &&
+      Number.isFinite(value['order']) &&
+      typeof value['visible'] === 'boolean' &&
+      this.isPageSeo(value['seo']) &&
+      this.isArrayOf(value['sections'], (section) => this.isSectionV2(section))
+    );
+  }
+
+  private isSectionV2(value: unknown): boolean {
+    if (!this.isSectionBase(value))
+      return false;
+
+    switch (value['type']) {
+      case 'hero':
+        return this.isHeroSection(value);
+      case 'project-grid':
+        return this.isProjectGridSection(value);
+      case 'whatsapp-cta':
+        return this.isWhatsappCtaSection(value);
+      case 'contact-form':
+        return this.isContactFormSection(value);
+      default:
+        return false;
+    }
+  }
+
   private isSectionBase(value: unknown): value is Record<string, unknown> {
     if (!this.isRecord(value))
       return false;
@@ -475,6 +552,49 @@ export class SiteConfigValidatorService {
     );
   }
 
+  private isProjectGridSection(value: Record<string, unknown>): boolean {
+    return (
+      value['variant'] === 'grid-v1' &&
+      this.isNonEmptyString(value['overline']) &&
+      this.isRichText(value['title']) &&
+      this.isStringArray(value['description']) &&
+      this.isArrayOf(value['projectIds'], (projectId) => this.isId(projectId)) &&
+      Number.isInteger(value['maxColumns']) &&
+      this.isNumberInRange(value['maxColumns'], 1, 4)
+    );
+  }
+
+  private isWhatsappCtaSection(value: Record<string, unknown>): boolean {
+    return (
+      value['variant'] === 'editorial-v1' &&
+      this.isNonEmptyString(value['overline']) &&
+      this.isRichText(value['title']) &&
+      this.isStringArray(value['body']) &&
+      this.isNonEmptyString(value['label']) &&
+      this.isNonEmptyString(value['message'])
+    );
+  }
+
+  private isContactFormSection(value: Record<string, unknown>): boolean {
+    return (
+      value['variant'] === 'default-v1' &&
+      this.isNonEmptyString(value['overline']) &&
+      this.isRichText(value['title']) &&
+      this.isStringArray(value['description']) &&
+      [
+        'nameLabel',
+        'emailLabel',
+        'phoneLabel',
+        'subjectLabel',
+        'messageLabel',
+        'submitLabel',
+        'successMessage',
+        'errorMessage',
+        'privacyNotice',
+      ].every((key) => this.isNonEmptyString(value[key]))
+    );
+  }
+
   private isRichText(value: unknown): boolean {
     if (!this.isRecord(value) || !Array.isArray(value['lines']) || value['lines'].length === 0)
       return false;
@@ -513,6 +633,20 @@ export class SiteConfigValidatorService {
       return false;
 
     return value['href'] === undefined || this.isSafeHref(value['href']);
+  }
+
+  private isSiteContact(value: unknown): boolean {
+    if (!this.isRecord(value))
+      return false;
+
+    return (
+      this.isEmail(value['email']) &&
+      this.isNonEmptyString(value['phoneLabel']) &&
+      this.isE164Phone(value['phoneE164']) &&
+      this.isInstagramUrl(value['instagramUrl']) &&
+      this.isWhatsappNumber(value['whatsappNumber']) &&
+      this.isNonEmptyString(value['whatsappDefaultMessage'])
+    );
   }
 
   private hasValidRelationships(config: SiteConfigV1): boolean {
@@ -573,6 +707,94 @@ export class SiteConfigValidatorService {
     );
   }
 
+  private hasValidV2Relationships(config: SiteConfigV2): boolean {
+    const normalizedOrganizationPhone = this.normalizeE164Phone(
+      config.seo.organization.telephone,
+    );
+
+    if (
+      config.contact.email !== config.seo.organization.email ||
+      !normalizedOrganizationPhone ||
+      config.contact.phoneE164 !== normalizedOrganizationPhone ||
+      config.pages.some((page) => page.slug === 'portfolio')
+    )
+      return false;
+
+    if (
+      !this.hasUniqueValues(config.media.map((asset) => asset.id)) ||
+      !this.hasUniqueValues(config.portfolioCategories.map((category) => category.id)) ||
+      !this.hasUniqueValues(config.projects.map((project) => project.id)) ||
+      !this.hasUniqueValues(config.projects.map((project) => project.slug)) ||
+      !this.hasUniqueValues(config.pages.map((page) => page.id)) ||
+      !this.hasUniqueValues(config.pages.map((page) => page.slug)) ||
+      !this.hasUniqueValues(config.pages.map((page) => page.path)) ||
+      !this.hasUniqueValues(config.pages.map((page) => page.order))
+    )
+      return false;
+
+    const homePages = config.pages.filter((page) => page.slug === 'home');
+
+    if (homePages.length !== 1 || !homePages[0]?.visible)
+      return false;
+
+    if (
+      config.pages.some(
+        (page) =>
+          page.path !== (page.slug === 'home' ? '/' : `/${page.slug}`) ||
+          page.seo.canonicalPath !== page.path ||
+          !this.hasUniqueValues(page.sections.map((section) => section.id)) ||
+          !this.hasUniqueValues(page.sections.map((section) => section.anchor)) ||
+          !this.hasUniqueValues(page.sections.map((section) => section.order)),
+      )
+    )
+      return false;
+
+    const mediaIds = new Set(config.media.map((asset) => asset.id));
+    const categoryIds = new Set(config.portfolioCategories.map((category) => category.id));
+    const projectIds = new Set(config.projects.map((project) => project.id));
+    const mediaReferences = [
+      config.identity.logoLightMediaId,
+      config.identity.logoDarkMediaId,
+      config.identity.faviconMediaId,
+      config.seo.openGraph.imageMediaId,
+      config.seo.twitter.imageMediaId,
+      config.header.logo.assetId,
+      config.footer.logo.assetId,
+      ...config.portfolioCategories.flatMap((category) =>
+        category.coverMediaId ? [category.coverMediaId] : [],
+      ),
+      ...config.pages.map((page) => page.seo.imageMediaId),
+      ...config.pages.flatMap((page) =>
+        page.sections.flatMap((section) =>
+          section.type === 'hero' ? [section.background.assetId] : [],
+        ),
+      ),
+      ...config.projects.flatMap((project) => [
+        project.cover.assetId,
+        project.seo.imageMediaId,
+        ...project.gallery.map((item) => item.assetId),
+      ]),
+    ];
+
+    return (
+      mediaReferences.every((mediaId) => mediaIds.has(mediaId)) &&
+      config.projects.every((project) =>
+        project.categoryIds.every((categoryId) => categoryIds.has(categoryId)),
+      ) &&
+      config.projects.every(
+        (project) => project.seo.canonicalPath === `/portfolio/projeto/${project.slug}`,
+      ) &&
+      config.pages.every((page) =>
+        page.sections.every(
+          (section) =>
+            section.type !== 'project-grid' ||
+            (this.hasUniqueValues(section.projectIds) &&
+              section.projectIds.every((projectId) => projectIds.has(projectId))),
+        ),
+      )
+    );
+  }
+
   private hasTextFields(value: unknown, keys: readonly string[]): boolean {
     if (!this.isRecord(value))
       return false;
@@ -596,8 +818,34 @@ export class SiteConfigValidatorService {
     return typeof value === 'object' && value !== null && !Array.isArray(value);
   }
 
+  private ownsProperty(value: Record<string, unknown>, property: string): boolean {
+    return Object.prototype.hasOwnProperty.call(value, property);
+  }
+
   private isNonEmptyString(value: unknown): value is string {
     return typeof value === 'string' && value.trim().length > 0 && value.length <= 5000;
+  }
+
+  private isEmail(value: unknown): value is string {
+    return (
+      typeof value === 'string' &&
+      value.length <= 320 &&
+      /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)
+    );
+  }
+
+  private isE164Phone(value: unknown): value is string {
+    return typeof value === 'string' && /^\+[1-9][0-9]{7,14}$/.test(value);
+  }
+
+  private normalizeE164Phone(value: string): string | null {
+    const digits = value.replace(/[^0-9]/g, '');
+
+    return /^[1-9][0-9]{7,14}$/.test(digits) ? `+${digits}` : null;
+  }
+
+  private isWhatsappNumber(value: unknown): value is string {
+    return typeof value === 'string' && /^[1-9][0-9]{7,14}$/.test(value);
   }
 
   private isId(value: unknown): value is string {
@@ -641,6 +889,15 @@ export class SiteConfigValidatorService {
     return typeof value === 'string' && /^\/[a-z0-9/-]*$/.test(value) && !value.includes('..');
   }
 
+  private isSafePagePath(value: unknown): value is string {
+    return (
+      typeof value === 'string' &&
+      /^\/(?:[a-z0-9](?:[a-z0-9-]{0,62}[a-z0-9])?(?:\/[a-z0-9](?:[a-z0-9-]{0,62}[a-z0-9])?)*)?$/.test(
+        value,
+      )
+    );
+  }
+
   private isSafeHref(value: unknown): value is string {
     if (typeof value !== 'string' || /[<>"'`\s]/.test(value))
       return false;
@@ -654,6 +911,25 @@ export class SiteConfigValidatorService {
 
     try {
       return new URL(value).protocol === 'https:';
+    } catch {
+      return false;
+    }
+  }
+
+  private isInstagramUrl(value: unknown): value is string {
+    if (typeof value !== 'string')
+      return false;
+
+    try {
+      const url = new URL(value);
+
+      return (
+        url.protocol === 'https:' &&
+        url.username === '' &&
+        url.password === '' &&
+        url.port === '' &&
+        (url.hostname === 'instagram.com' || url.hostname === 'www.instagram.com')
+      );
     } catch {
       return false;
     }

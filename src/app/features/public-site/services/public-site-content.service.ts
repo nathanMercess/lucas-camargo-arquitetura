@@ -17,12 +17,15 @@ import { MediaAsset } from '../../../shared/models/media-asset.model';
 import { PageSeo } from '../../../shared/models/page-seo.model';
 import { PortfolioProject } from '../../../shared/models/portfolio-project.model';
 import { PortfolioSectionConfig } from '../../../shared/models/portfolio-section-config.model';
-import { SiteConfigV1 } from '../../../shared/models/site-config-v1.model';
+import { SiteDocument } from '../../../shared/models/site-document.model';
+import { SitePageV2 } from '../../../shared/models/site-page-v2.model';
+import { SiteSection } from '../../../shared/models/site-section.model';
 import { PublicSiteContentState } from '../models/public-site-content-state.model';
 import { PublicSiteRuntimeWindow } from '../models/public-site-runtime-window.model';
 import { SiteConfigValidatorService } from './site-config-validator.service';
 
-const CONTENT_CACHE_KEY = 'lucas-camargo-site-config-v1';
+const CONTENT_CACHE_KEY_V1 = 'lucas-camargo-site-config-v1';
+const CONTENT_CACHE_KEY_V2 = 'lucas-camargo-site-config-v2';
 const DEFAULT_CONTENT_BASE_URL = '/content';
 
 @Injectable({
@@ -52,25 +55,96 @@ export class PublicSiteContentService {
 
   public readonly isLoading = computed(() => this.state().isLoading);
 
-  public readonly visibleSections = computed(() =>
-    [...this.config().sections]
+  public readonly visibleSections = computed<readonly SiteSection[]>(() => {
+    const config = this.config();
+
+    if (config.schemaVersion !== 1)
+      return [];
+
+    return [...config.sections]
       .filter((section) => section.visible)
-      .sort((first, second) => first.order - second.order),
+      .sort((first, second) => first.order - second.order);
+  });
+
+  public readonly visiblePages = computed<readonly SitePageV2[]>(() => {
+    const config = this.config();
+
+    if (config.schemaVersion !== 2)
+      return [];
+
+    return [...config.pages]
+      .filter((page) => page.visible)
+      .sort((first, second) => first.order - second.order || first.id.localeCompare(second.id));
+  });
+
+  public readonly homePage = computed(() =>
+    this.visiblePages().find((page) => page.slug === 'home'),
   );
 
   public readonly navigationItems = computed(() => this.config().navigationItems);
 
   public readonly portfolioCategories = computed(() => this.config().portfolioCategories);
 
-  public readonly portfolioSection = computed<PortfolioSectionConfig | undefined>(() =>
-    this.visibleSections().find(
+  private readonly configuredV2ProjectIds = computed(() => {
+    const projectIds = new Set<string>();
+
+    for (const page of this.visiblePages())
+      for (const section of page.sections)
+        if (section.visible && section.type === 'project-grid')
+          for (const projectId of section.projectIds)
+            projectIds.add(projectId);
+
+    return projectIds;
+  });
+
+  public readonly portfolioSection = computed<PortfolioSectionConfig | undefined>(() => {
+    const v1Section = this.visibleSections().find(
       (section): section is PortfolioSectionConfig => section.type === 'portfolio',
-    ),
-  );
+    );
+
+    if (v1Section)
+      return v1Section;
+
+    const projectGrid = this.visiblePages()
+      .flatMap((page) => page.sections)
+      .filter((section) => section.visible)
+      .find((section) => section.type === 'project-grid');
+
+    if (!projectGrid)
+      return undefined;
+
+    const configuredProjectIds = this.configuredV2ProjectIds();
+    const configuredCategoryIds = new Set(
+      this.config()
+        .projects.filter((project) => configuredProjectIds.has(project.id))
+        .flatMap((project) => project.categoryIds),
+    );
+
+    return {
+      id: projectGrid.id,
+      type: 'portfolio',
+      order: projectGrid.order,
+      visible: projectGrid.visible,
+      anchor: projectGrid.anchor,
+      variant: 'horizontal-accordion-v1',
+      overline: projectGrid.overline,
+      title: projectGrid.title,
+      description: projectGrid.description,
+      categoryIds: this.config()
+        .portfolioCategories.filter((category) => configuredCategoryIds.has(category.id))
+        .map((category) => category.id),
+      autoRotationEnabled: false,
+      autoRotationIntervalMs: 5000,
+    };
+  });
 
   public readonly visibleProjects = computed<readonly PortfolioProject[]>(() =>
     [...this.config().projects]
-      .filter((project) => project.visible)
+      .filter(
+        (project) =>
+          project.visible &&
+          (this.config().schemaVersion === 1 || this.configuredV2ProjectIds().has(project.id)),
+      )
       .sort((first, second) => first.order - second.order || first.id.localeCompare(second.id)),
   );
 
@@ -88,7 +162,7 @@ export class PublicSiteContentService {
   );
 
   public constructor() {
-    this.applyConfig(DEFAULT_SITE_CONFIG, false);
+    this.applySiteDocument(DEFAULT_SITE_CONFIG, false);
     this.loadContent();
   }
 
@@ -108,16 +182,19 @@ export class PublicSiteContentService {
 
           return this.http.get<unknown>(this.resolveConfigUrl(manifest.siteConfigKey)).pipe(
             take(1),
-            switchMap((config) => {
-              if (!this.validator.isSiteConfigV1(config))
+            switchMap((siteDocument) => {
+              if (!this.validator.isSiteDocument(siteDocument))
                 throw new Error('Configuração pública inválida.');
 
-              return from(this.matchesManifestSha256(config, manifest.sha256)).pipe(
+              if (siteDocument.releaseId !== manifest.releaseId)
+                throw new Error('A configuração pública não corresponde ao release publicado.');
+
+              return from(this.matchesManifestSha256(siteDocument, manifest.sha256)).pipe(
                 map((matchesManifest) => {
                   if (!matchesManifest)
                     throw new Error('O conteúdo não corresponde ao manifesto publicado.');
 
-                  return config;
+                  return siteDocument;
                 }),
               );
             }),
@@ -126,7 +203,7 @@ export class PublicSiteContentService {
         finalize(() => this.setLoading(false)),
       )
       .subscribe({
-        next: (config) => this.applyConfig(config, true),
+        next: (siteDocument) => this.applyPublishedDocument(siteDocument),
         error: () => this.restoreFallback(),
       });
   }
@@ -169,17 +246,21 @@ export class PublicSiteContentService {
     this.updateCanonicalUrl(canonicalUrl);
   }
 
-  private applyConfig(config: SiteConfigV1, shouldCache: boolean): void {
-    this.state.update((state) => ({ ...state, config }));
-    this.applyTheme(config);
-    this.applySeo(config);
+  private applySiteDocument(siteDocument: SiteDocument, shouldCache: boolean): void {
+    this.state.update((state) => ({ ...state, config: siteDocument }));
+    this.applyTheme(siteDocument);
+    this.applySeo(siteDocument);
 
     if (shouldCache)
-      this.writeCache(config);
+      this.writeCache(siteDocument);
+  }
+
+  private applyPublishedDocument(siteDocument: SiteDocument): void {
+    this.applySiteDocument(siteDocument, true);
   }
 
   private restoreFallback(): void {
-    this.applyConfig(this.readCache() ?? DEFAULT_SITE_CONFIG, false);
+    this.applySiteDocument(this.readCache() ?? DEFAULT_SITE_CONFIG, false);
   }
 
   private setLoading(isLoading: boolean): void {
@@ -228,40 +309,60 @@ export class PublicSiteContentService {
     }
   }
 
-  private readCache(): SiteConfigV1 | null {
+  private readCache(): SiteDocument | null {
     try {
-      const serializedConfig = this.document.defaultView?.localStorage.getItem(CONTENT_CACHE_KEY);
+      const cacheEntries = [CONTENT_CACHE_KEY_V1, CONTENT_CACHE_KEY_V2] as const;
+      const cachedDocuments: SiteDocument[] = [];
 
-      if (!serializedConfig)
-        return null;
+      for (const cacheKey of cacheEntries) {
+        const serializedDocument = this.document.defaultView?.localStorage.getItem(cacheKey);
 
-      const cachedConfig: unknown = JSON.parse(serializedConfig);
+        if (!serializedDocument)
+          continue;
 
-      if (this.validator.isSiteConfigV1(cachedConfig))
-        return cachedConfig;
+        const cachedDocument: unknown = JSON.parse(serializedDocument);
+        const hasExpectedVersion =
+          (cacheKey === CONTENT_CACHE_KEY_V1 && this.validator.isSiteConfigV1(cachedDocument)) ||
+          (cacheKey === CONTENT_CACHE_KEY_V2 && this.validator.isSiteConfigV2(cachedDocument));
 
-      this.document.defaultView?.localStorage.removeItem(CONTENT_CACHE_KEY);
-      return null;
+        if (hasExpectedVersion && this.validator.isSiteDocument(cachedDocument)) {
+          cachedDocuments.push(cachedDocument);
+          continue;
+        }
+
+        this.document.defaultView?.localStorage.removeItem(cacheKey);
+      }
+
+      return (
+        cachedDocuments.sort(
+          (first, second) => Date.parse(second.publishedAt) - Date.parse(first.publishedAt),
+        )[0] ?? null
+      );
     } catch {
       return null;
     }
   }
 
-  private writeCache(config: SiteConfigV1): void {
+  private writeCache(siteDocument: SiteDocument): void {
     try {
-      this.document.defaultView?.localStorage.setItem(CONTENT_CACHE_KEY, JSON.stringify(config));
+      const cacheKey =
+        siteDocument.schemaVersion === 1 ? CONTENT_CACHE_KEY_V1 : CONTENT_CACHE_KEY_V2;
+      this.document.defaultView?.localStorage.setItem(cacheKey, JSON.stringify(siteDocument));
     } catch {
       return;
     }
   }
 
-  private async matchesManifestSha256(config: SiteConfigV1, expectedSha256: string): Promise<boolean> {
+  private async matchesManifestSha256(
+    siteDocument: SiteDocument,
+    expectedSha256: string,
+  ): Promise<boolean> {
     const subtleCrypto = globalThis.crypto?.subtle;
 
     if (!subtleCrypto)
       return false;
 
-    const serializedConfig = new TextEncoder().encode(JSON.stringify(config));
+    const serializedConfig = new TextEncoder().encode(JSON.stringify(siteDocument));
     const digest = await subtleCrypto.digest('SHA-256', serializedConfig);
     const actualSha256 = Array.from(
       new Uint8Array(digest),
@@ -271,7 +372,7 @@ export class PublicSiteContentService {
     return actualSha256 === expectedSha256;
   }
 
-  private applyTheme(config: SiteConfigV1): void {
+  private applyTheme(config: SiteDocument): void {
     const root = this.document.documentElement;
     const { colors, layout, motion, typography } = config.theme;
     const tokens: readonly (readonly [string, string])[] = [
@@ -306,7 +407,7 @@ export class PublicSiteContentService {
       this.renderer.addClass(root, 'site-reveal-disabled');
   }
 
-  private applySeo(config: SiteConfigV1): void {
+  private applySeo(config: SiteDocument): void {
     const { seo } = config;
     const openGraphImage = this.absoluteMediaUrl(config, seo.openGraph.imageMediaId);
     const twitterImage = this.absoluteMediaUrl(config, seo.twitter.imageMediaId);
@@ -351,7 +452,7 @@ export class PublicSiteContentService {
     this.renderer.setAttribute(canonicalLink, 'href', url);
   }
 
-  private updateFavicon(config: SiteConfigV1): void {
+  private updateFavicon(config: SiteDocument): void {
     const favicon = config.media.find((asset) => asset.id === config.identity.faviconMediaId);
 
     if (!favicon)
@@ -369,7 +470,7 @@ export class PublicSiteContentService {
     this.renderer.setAttribute(faviconLink, 'href', this.resolveMediaSource(favicon.path));
   }
 
-  private updateOrganizationSchema(config: SiteConfigV1): void {
+  private updateOrganizationSchema(config: SiteDocument): void {
     let script = this.document.head.querySelector<HTMLScriptElement>('#site-organization-schema');
 
     if (!script) {
@@ -398,7 +499,7 @@ export class PublicSiteContentService {
     this.renderer.setProperty(script, 'textContent', JSON.stringify(structuredData));
   }
 
-  private absoluteMediaUrl(config: SiteConfigV1, assetId: string): string {
+  private absoluteMediaUrl(config: SiteDocument, assetId: string): string {
     const path = config.media.find((asset) => asset.id === assetId)?.path ?? '';
     const resolvedPath = this.resolveMediaSource(path);
 

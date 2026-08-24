@@ -1,5 +1,6 @@
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { RouterModule } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
@@ -38,6 +39,7 @@ describe('PublicSiteComponent', () => {
         RevealOnScrollDirective,
       ],
       providers: [provideHttpClient(), provideHttpClientTesting()],
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
 
     httpTestingController = TestBed.inject(HttpTestingController);

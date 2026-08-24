@@ -1,8 +1,11 @@
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
+import { ReactiveFormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 import { GalleriaModule } from 'primeng/galleria';
 
+import { ConfigurablePageComponent } from './components/configurable-page/configurable-page.component';
+import { ContactFormSectionComponent } from './components/contact-form-section/contact-form-section.component';
 import { ContactSectionComponent } from './components/contact-section/contact-section.component';
 import { CustomPageRendererComponent } from './components/custom-page-renderer/custom-page-renderer.component';
 import { HeroSectionComponent } from './components/hero-section/hero-section.component';
@@ -14,8 +17,9 @@ import { PortfolioGridComponent } from './components/portfolio-grid/portfolio-gr
 import { ProcessSectionComponent } from './components/process-section/process-section.component';
 import { PublicPageShellComponent } from './components/public-page-shell/public-page-shell.component';
 import { RichTextComponent } from './components/rich-text/rich-text.component';
-import { SiteHeaderComponent } from './components/site-header/site-header.component';
 import { SiteFooterComponent } from './components/site-footer/site-footer.component';
+import { SiteHeaderComponent } from './components/site-header/site-header.component';
+import { WhatsappCtaSectionComponent } from './components/whatsapp-cta-section/whatsapp-cta-section.component';
 import { RevealOnScrollDirective } from './directives/reveal-on-scroll.directive';
 import { PortfolioDetailComponent } from './pages/portfolio-detail/portfolio-detail.component';
 import { PortfolioListingComponent } from './pages/portfolio-listing/portfolio-listing.component';
@@ -24,16 +28,15 @@ import { PublicSiteRoutingModule } from './public-site-routing.module';
 import { PublicSiteComponent } from './public-site.component';
 
 @NgModule({
-  imports: [CommonModule, ButtonModule, GalleriaModule, PublicSiteRoutingModule],
+  imports: [CommonModule, ReactiveFormsModule, ButtonModule, GalleriaModule, PublicSiteRoutingModule],
   declarations: [
-    PublicSiteComponent,
+    ConfigurablePageComponent,
+    ContactFormSectionComponent,
     ContactSectionComponent,
     CustomPageRendererComponent,
     HeroSectionComponent,
     ManifestoSectionComponent,
     MetricsSectionComponent,
-    SiteHeaderComponent,
-    SiteFooterComponent,
     PortfolioAccordionComponent,
     PortfolioGalleryComponent,
     PortfolioGridComponent,
@@ -41,9 +44,13 @@ import { PublicSiteComponent } from './public-site.component';
     PortfolioListingComponent,
     NotFoundComponent,
     ProcessSectionComponent,
+    PublicSiteComponent,
     PublicPageShellComponent,
     RichTextComponent,
     RevealOnScrollDirective,
+    SiteFooterComponent,
+    SiteHeaderComponent,
+    WhatsappCtaSectionComponent,
   ],
 })
 export class PublicSiteModule {}

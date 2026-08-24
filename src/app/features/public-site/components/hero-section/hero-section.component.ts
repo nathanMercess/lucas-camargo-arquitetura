@@ -25,4 +25,8 @@ export class HeroSectionComponent {
   public readonly logoPath = input.required<string>();
 
   public readonly skipTarget = input.required<string>();
+
+  public readonly showHeader = input(true);
+
+  public readonly showSkipLink = input(true);
 }

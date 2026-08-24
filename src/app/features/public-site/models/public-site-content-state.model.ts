@@ -1,6 +1,6 @@
-import { SiteConfigV1 } from '../../../shared/models/site-config-v1.model';
+import { SiteDocument } from '../../../shared/models/site-document.model';
 
 export interface PublicSiteContentState {
-  readonly config: SiteConfigV1;
+  readonly config: SiteDocument;
   readonly isLoading: boolean;
 }

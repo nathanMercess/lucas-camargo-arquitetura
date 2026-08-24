@@ -15,7 +15,9 @@ RUN yarn build --configuration production
 FROM nginxinc/nginx-unprivileged:stable-alpine
 
 ENV CONTENT_BASE_URL=/content \
-  NGINX_ENVSUBST_FILTER=CONTENT_BASE_URL \
+  CONTACT_ENDPOINT_URL=https://lucas-camargo-contact.nathan66merces.workers.dev/contact \
+  TURNSTILE_SITE_KEY="" \
+  NGINX_ENVSUBST_FILTER="CONTENT_BASE_URL|CONTACT_ENDPOINT_URL|TURNSTILE_SITE_KEY" \
   NGINX_ENVSUBST_OUTPUT_DIR=/usr/share/nginx/html/runtime
 
 COPY deploy/nginx.conf /etc/nginx/conf.d/default.conf

@@ -5,6 +5,8 @@ param(
   [string]$ServiceName = 'lucas-camargo-site',
   [string]$RepositoryName = 'lucas-camargo',
   [string]$ContentBaseUrl = '/content',
+  [string]$ContactEndpointUrl = 'https://lucas-camargo-contact.nathan66merces.workers.dev/contact',
+  [string]$TurnstileSiteKey = $env:TURNSTILE_SITE_KEY,
   [switch]$AllowDirty
 )
 
@@ -81,6 +83,24 @@ if ($ContentBaseUrl -ne '/content') {
   }
 
   $ContentBaseUrl = $parsedContentBaseUrl.GetLeftPart([UriPartial]::Path).TrimEnd('/')
+}
+
+[Uri]$parsedContactEndpointUrl = $null
+$hasSafeContactEndpoint = (
+  [Uri]::TryCreate($ContactEndpointUrl, [UriKind]::Absolute, [ref]$parsedContactEndpointUrl) -and
+  $parsedContactEndpointUrl.Scheme -eq 'https' -and
+  [string]::IsNullOrEmpty($parsedContactEndpointUrl.UserInfo) -and
+  [string]::IsNullOrEmpty($parsedContactEndpointUrl.Query) -and
+  [string]::IsNullOrEmpty($parsedContactEndpointUrl.Fragment) -and
+  $parsedContactEndpointUrl.AbsolutePath -eq '/contact'
+)
+
+if (-not $hasSafeContactEndpoint) {
+  throw 'ContactEndpointUrl deve ser uma URL HTTPS sem credenciais, query ou fragmento e terminada em /contact.'
+}
+
+if (-not $TurnstileSiteKey -or $TurnstileSiteKey -notmatch '^[a-zA-Z0-9_-]{3,100}$') {
+  throw 'TurnstileSiteKey deve ser informado por variável de ambiente e conter apenas caracteres seguros.'
 }
 
 Push-Location $repositoryRoot
@@ -192,7 +212,7 @@ try {
     '--cpu-throttling',
     '--no-cpu-boost',
     '--port=8080',
-    "--set-env-vars=CONTENT_BASE_URL=$ContentBaseUrl",
+    "--set-env-vars=CONTENT_BASE_URL=$ContentBaseUrl,CONTACT_ENDPOINT_URL=$ContactEndpointUrl,TURNSTILE_SITE_KEY=$TurnstileSiteKey",
     "--service-account=$runtimeAccountEmail",
     '--labels=environment=production,managed-by=gcloud-script',
     "--account=$authorizedAccount",

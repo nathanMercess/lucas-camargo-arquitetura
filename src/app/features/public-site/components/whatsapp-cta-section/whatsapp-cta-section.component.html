@@ -1,0 +1,18 @@
+<section [id]="config().anchor" class="whatsapp-cta-section"
+  [attr.aria-labelledby]="config().id + '-title'">
+  <p class="whatsapp-cta-section-overline">{{ config().overline }}</p>
+  <div class="whatsapp-cta-section-content" appRevealOnScroll>
+    <h2 [id]="config().id + '-title'"><app-rich-text [content]="config().title" /></h2>
+    <div class="whatsapp-cta-section-copy">
+      @for (paragraph of config().body; track paragraph) {
+        <p>{{ paragraph }}</p>
+      }
+      @if (href(); as whatsappHref) {
+        <a [href]="whatsappHref" target="_blank" rel="noopener noreferrer">
+          {{ config().label }}
+          <span class="public-site-arrow" aria-hidden="true"></span>
+        </a>
+      }
+    </div>
+  </div>
+</section>

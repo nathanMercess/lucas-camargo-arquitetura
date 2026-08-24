@@ -1,3 +1,5 @@
 window.__LUCAS_CAMARGO_RUNTIME__ = Object.freeze({
   contentBaseUrl: '${CONTENT_BASE_URL}',
+  contactEndpointUrl: '${CONTACT_ENDPOINT_URL}',
+  turnstileSiteKey: '${TURNSTILE_SITE_KEY}',
 });

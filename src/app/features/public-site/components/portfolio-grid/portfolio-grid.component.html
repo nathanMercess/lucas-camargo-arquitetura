@@ -1,4 +1,5 @@
-<div class="portfolio-grid">
+<div class="portfolio-grid" [class.portfolio-grid--configured]="maxColumns() !== null"
+  [style.--portfolio-grid-columns]="maxColumns()">
   @for (card of cards(); track card.project.id) {
     <article class="portfolio-grid-card">
       <a class="portfolio-grid-card-link" [routerLink]="['/portfolio/projeto', card.project.slug]">

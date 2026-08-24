@@ -1,8 +1,12 @@
-<a class="hero-section-skip-link" [href]="'#' + skipTarget()">{{ uiLabels().skipToContent }}</a>
+@if (showSkipLink()) {
+  <a class="hero-section-skip-link" [href]="'#' + skipTarget()">{{ uiLabels().skipToContent }}</a>
+}
 
-<section [id]="config().anchor" class="hero-section" aria-labelledby="hero-title">
-  <app-site-header [config]="headerConfig()" [navigationItems]="navigationItems()" [uiLabels]="uiLabels()"
-    [logoPath]="logoPath()" />
+<section [id]="config().anchor" class="hero-section" [attr.aria-labelledby]="config().id + '-title'">
+  @if (showHeader()) {
+    <app-site-header [config]="headerConfig()" [navigationItems]="navigationItems()" [uiLabels]="uiLabels()"
+      [logoPath]="logoPath()" />
+  }
 
   <img class="hero-section-image" [src]="backgroundPath()"
     [alt]="config().background.decorative ? '' : config().background.alt"
@@ -12,7 +16,7 @@
 
   <div class="hero-section-content">
     <p class="hero-section-overline">{{ config().overline }}</p>
-    <h1 id="hero-title"><app-rich-text [content]="config().title" /></h1>
+    <h1 [id]="config().id + '-title'"><app-rich-text [content]="config().title" /></h1>
 
     <div class="hero-section-bottom">
       <p><app-rich-text [content]="config().supportingText" /></p>

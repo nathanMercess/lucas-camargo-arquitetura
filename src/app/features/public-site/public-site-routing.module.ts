@@ -1,11 +1,12 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
+import { ConfigurablePageComponent } from './components/configurable-page/configurable-page.component';
 import { PortfolioDetailComponent } from './pages/portfolio-detail/portfolio-detail.component';
 import { PortfolioListingComponent } from './pages/portfolio-listing/portfolio-listing.component';
 import { NotFoundComponent } from './pages/not-found/not-found.component';
 import { PublicSiteComponent } from './public-site.component';
 
-const routes: Routes = [
+export const PUBLIC_SITE_ROUTES: Routes = [
   {
     path: '',
     component: PublicSiteComponent,
@@ -23,13 +24,17 @@ const routes: Routes = [
     component: PortfolioDetailComponent,
   },
   {
+    path: ':pageSlug',
+    component: ConfigurablePageComponent,
+  },
+  {
     path: '**',
     component: NotFoundComponent,
   },
 ];
 
 @NgModule({
-  imports: [RouterModule.forChild(routes)],
+  imports: [RouterModule.forChild(PUBLIC_SITE_ROUTES)],
   exports: [RouterModule],
 })
 export class PublicSiteRoutingModule {}

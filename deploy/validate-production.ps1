@@ -127,6 +127,12 @@ Assert-FileContains -Path (Join-Path $siteRepository 'deploy/nginx.conf') -Patte
 Assert-FileContains -Path (Join-Path $siteRepository 'deploy/runtime-config.js.template') `
   -Pattern "contentBaseUrl: '\$\{CONTENT_BASE_URL\}'" `
   -Message 'O runtime config do site nao recebe CONTENT_BASE_URL.'
+Assert-FileContains -Path (Join-Path $siteRepository 'deploy/runtime-config.js.template') `
+  -Pattern "contactEndpointUrl: '\$\{CONTACT_ENDPOINT_URL\}'" `
+  -Message 'O runtime config do site nao recebe CONTACT_ENDPOINT_URL.'
+Assert-FileContains -Path (Join-Path $siteRepository 'deploy/runtime-config.js.template') `
+  -Pattern "turnstileSiteKey: '\$\{TURNSTILE_SITE_KEY\}'" `
+  -Message 'O runtime config do site nao recebe TURNSTILE_SITE_KEY.'
 
 $manifestPaths = @(
   (Join-Path $ApiRepository 'deploy/initial-published-manifest.json'),

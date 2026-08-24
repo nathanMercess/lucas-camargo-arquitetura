@@ -1,0 +1,208 @@
+:host {
+  display: block;
+}
+
+.contact-form-section {
+  display: grid;
+  padding: clamp(90px, 11vw, 170px) var(--page-gutter);
+  grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+  gap: clamp(54px, 8vw, 140px);
+  background: var(--brand-surface);
+}
+
+.contact-form-section-overline,
+.contact-form-field label,
+.contact-form-privacy,
+.contact-form-error {
+  font-family: var(--font-data);
+}
+
+.contact-form-section-overline {
+  margin: 0 0 28px;
+  font-size: 0.7rem;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+}
+
+.contact-form-section-overline::before {
+  display: inline-block;
+  width: 34px;
+  height: 2px;
+  margin: 0 12px 3px 0;
+  background: var(--brand-accent);
+  content: '';
+}
+
+.contact-form-section h2 {
+  margin: 0;
+  font-size: clamp(2.5rem, 5.2vw, 6rem);
+  letter-spacing: -0.06em;
+  line-height: 0.96;
+  text-transform: uppercase;
+  overflow-wrap: anywhere;
+}
+
+.contact-form-section h2 em {
+  color: var(--brand-accent);
+  font-style: normal;
+}
+
+.contact-form-section-description {
+  max-width: 580px;
+  margin: 30px 0 0;
+  color: var(--brand-text-muted);
+  line-height: 1.7;
+}
+
+.contact-form {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 30px 24px;
+}
+
+.contact-form-field {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.contact-form-field--message,
+.contact-form-privacy,
+.contact-form-turnstile,
+.contact-form-unavailable,
+.contact-form-submit,
+.contact-form-status {
+  grid-column: 1 / -1;
+}
+
+.contact-form-field label {
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.contact-form-field input,
+.contact-form-field textarea {
+  width: 100%;
+  min-width: 0;
+  padding: 16px 0;
+  color: var(--brand-ink);
+  font: inherit;
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid var(--brand-border);
+  border-radius: 0;
+}
+
+.contact-form-field textarea {
+  resize: vertical;
+}
+
+.contact-form-field input:focus-visible,
+.contact-form-field textarea:focus-visible {
+  outline: 2px solid var(--brand-focus);
+  outline-offset: 4px;
+}
+
+.contact-form-field [aria-invalid='true'] {
+  border-color: var(--brand-accent);
+}
+
+.contact-form-error {
+  color: var(--brand-accent);
+  font-size: 0.72rem;
+}
+
+.contact-form-privacy {
+  margin: 0;
+  color: var(--brand-text-muted);
+  font-size: 0.68rem;
+  line-height: 1.6;
+}
+
+.contact-form-submit {
+  width: fit-content;
+  min-height: 50px;
+  padding: 14px 28px;
+  color: var(--brand-surface);
+  font-family: var(--font-data);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  background: var(--brand-ink);
+  border: 0;
+}
+
+.contact-form-submit:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.contact-form-status {
+  min-height: 28px;
+}
+
+.contact-form-status p,
+.contact-form-unavailable p {
+  margin: 0;
+  line-height: 1.6;
+}
+
+.contact-form-status--success {
+  color: var(--brand-ink);
+}
+
+.contact-form-status--error {
+  color: var(--brand-accent);
+}
+
+.contact-form-honeypot {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.contact-form-unavailable {
+  padding: 28px;
+  align-self: start;
+  color: var(--brand-text-muted);
+  border: 1px solid var(--brand-border);
+}
+
+@media (width <= 820px) {
+  .contact-form-section {
+    padding-right: max(var(--page-gutter), calc(env(safe-area-inset-right) + 18px));
+    padding-left: max(var(--page-gutter), calc(env(safe-area-inset-left) + 18px));
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (width <= 560px) {
+  .contact-form {
+    grid-template-columns: 1fr;
+  }
+
+  .contact-form-field--message,
+  .contact-form-privacy,
+  .contact-form-turnstile,
+  .contact-form-unavailable,
+  .contact-form-submit,
+  .contact-form-status {
+    grid-column: auto;
+  }
+
+  .contact-form-turnstile {
+    max-width: 100%;
+    overflow: hidden;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .contact-form-submit {
+    transition: none;
+  }
+}

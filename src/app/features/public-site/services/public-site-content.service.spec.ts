@@ -6,7 +6,10 @@ import { Meta, Title } from '@angular/platform-browser';
 import { DEFAULT_SITE_CONFIG } from '../../../shared/config/default-site-config';
 import { PortfolioProject } from '../../../shared/models/portfolio-project.model';
 import { SiteConfigV1 } from '../../../shared/models/site-config-v1.model';
+import { SiteConfigV2 } from '../../../shared/models/site-config-v2.model';
+import { SiteDocument } from '../../../shared/models/site-document.model';
 import { SiteSection } from '../../../shared/models/site-section.model';
+import { createSiteConfigV2Fixture } from '../../../shared/testing/create-site-config-v2.fixture';
 import { PublicSiteRuntimeWindow } from '../models/public-site-runtime-window.model';
 import { PublicSiteContentService } from './public-site-content.service';
 
@@ -260,6 +263,98 @@ describe('PublicSiteContentService', () => {
 
     expect(service.config().releaseId).toBe(DEFAULT_SITE_CONFIG.releaseId);
   });
+
+  it('should verify, apply and cache a valid V2 release without using the V1 cache', async () => {
+    const siteDocument = createSiteConfigV2Fixture();
+    const sha256 = await calculateConfigSha256(siteDocument);
+    const digestSpy = vi.spyOn(globalThis.crypto.subtle, 'digest');
+    const service = TestBed.inject(PublicSiteContentService);
+
+    flushManifestAndDocument(siteDocument, siteDocument.releaseId, sha256);
+    await waitForContentLoad(service);
+
+    expect(digestSpy).toHaveBeenCalledOnce();
+    expect(service.config().releaseId).toBe(siteDocument.releaseId);
+    expect(service.config().schemaVersion).toBe(2);
+    expect(service.homePage()?.slug).toBe('home');
+    expect(service.visibleSections()).toEqual([]);
+    expect(window.localStorage.getItem('lucas-camargo-site-config-v1')).toBeNull();
+    expect(window.localStorage.getItem('lucas-camargo-site-config-v2')).toBe(
+      JSON.stringify(siteDocument),
+    );
+
+    digestSpy.mockRestore();
+  });
+
+  it('should reject a V2 document whose release does not match the manifest before hashing', async () => {
+    const siteDocument = createSiteConfigV2Fixture();
+    const sha256 = await calculateConfigSha256(siteDocument);
+    const digestSpy = vi.spyOn(globalThis.crypto.subtle, 'digest');
+    const service = TestBed.inject(PublicSiteContentService);
+
+    flushManifestAndDocument(siteDocument, 'different-release', sha256);
+    await waitForContentLoad(service);
+
+    expect(digestSpy).not.toHaveBeenCalled();
+    expect(service.config().releaseId).toBe(DEFAULT_SITE_CONFIG.releaseId);
+    expect(window.localStorage.getItem('lucas-camargo-site-config-v1')).toBeNull();
+
+    digestSpy.mockRestore();
+  });
+
+  it('should reject a V2 document whose hash does not match the manifest', async () => {
+    const siteDocument = createSiteConfigV2Fixture();
+    const service = TestBed.inject(PublicSiteContentService);
+
+    flushManifestAndDocument(siteDocument, siteDocument.releaseId, '0'.repeat(64));
+    await waitForContentLoad(service);
+
+    expect(service.config().releaseId).toBe(DEFAULT_SITE_CONFIG.releaseId);
+    expect(window.localStorage.getItem('lucas-camargo-site-config-v1')).toBeNull();
+  });
+
+  it('should restore the latest valid V2 cache when the manifest is unavailable', () => {
+    const siteDocument = createSiteConfigV2Fixture();
+
+    window.localStorage.setItem('lucas-camargo-site-config-v2', JSON.stringify(siteDocument));
+
+    const service = TestBed.inject(PublicSiteContentService);
+
+    httpTestingController.expectOne('/content/manifest.json').flush('Unavailable', {
+      status: 503,
+      statusText: 'Service Unavailable',
+    });
+
+    expect(service.config().schemaVersion).toBe(2);
+    expect(service.config().releaseId).toBe(siteDocument.releaseId);
+    expect(service.homePage()?.slug).toBe('home');
+  });
+
+  it('should adapt configured V2 project grids to the existing portfolio routes safely', async () => {
+    const baseDocument = createSiteConfigV2Fixture();
+    const project = createProject('residencia-v2', 10, true);
+    const siteDocument: SiteConfigV2 = {
+      ...baseDocument,
+      projects: [project],
+      pages: baseDocument.pages.map((page) => ({
+        ...page,
+        sections: page.sections.map((section) =>
+          section.type === 'project-grid'
+            ? { ...section, projectIds: [project.id] }
+            : section,
+        ),
+      })),
+    };
+    const sha256 = await calculateConfigSha256(siteDocument);
+    const service = TestBed.inject(PublicSiteContentService);
+
+    flushManifestAndDocument(siteDocument, siteDocument.releaseId, sha256);
+    await waitForContentLoad(service);
+
+    expect(service.visibleProjects().map((item) => item.id)).toEqual([project.id]);
+    expect(service.portfolioSection()?.categoryIds).toEqual(project.categoryIds);
+    expect(service.portfolioSection()?.autoRotationEnabled).toBe(false);
+  });
 });
 
 async function flushValidRelease(
@@ -278,7 +373,7 @@ async function flushValidRelease(
     .flush(config);
 }
 
-async function calculateConfigSha256(config: SiteConfigV1): Promise<string> {
+async function calculateConfigSha256(config: SiteDocument): Promise<string> {
   const subtleCrypto = globalThis.crypto?.subtle;
 
   if (!subtleCrypto)
@@ -291,6 +386,23 @@ async function calculateConfigSha256(config: SiteConfigV1): Promise<string> {
     new Uint8Array(digest),
     (byte) => byte.toString(16).padStart(2, '0'),
   ).join('');
+}
+
+function flushManifestAndDocument(
+  siteDocument: SiteDocument,
+  manifestReleaseId: string,
+  sha256: string,
+): void {
+  const controller = TestBed.inject(HttpTestingController);
+  const siteConfigKey = `versions/${siteDocument.releaseId}/site.json`;
+
+  controller.expectOne('/content/manifest.json').flush({
+    ...manifest,
+    releaseId: manifestReleaseId,
+    siteConfigKey,
+    sha256,
+  });
+  controller.expectOne(`/content/${siteConfigKey}`).flush(siteDocument);
 }
 
 async function waitForContentLoad(service: PublicSiteContentService): Promise<void> {
