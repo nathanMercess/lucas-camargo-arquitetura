@@ -233,5 +233,9 @@ jobs:
           yarn wrangler deploy --secrets-file "$secret_file"
       - name: Verificar publicação
         run: |
-          status=$(curl --silent --output /dev/null --write-out '%{http_code}' --request OPTIONS --header 'Origin: https://lucascamargo.com' --retry 5 --retry-delay 5 https://lucas-camargo-contact.nathan66merces.workers.dev/contact)
-          test "$status" = '204'
+          for attempt in 1 2 3 4 5; do
+            status=$(curl --silent --output /dev/null --write-out '%{http_code}' --request OPTIONS --header 'Origin: https://lucascamargo.com' https://lucas-camargo-contact.nathan66merces.workers.dev/contact)
+            test "$status" = '204' && exit 0
+            sleep 5
+          done
+          exit 1
