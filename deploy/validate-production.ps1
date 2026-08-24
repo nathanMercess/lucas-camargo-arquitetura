@@ -97,8 +97,8 @@ foreach ($repository in $repositories) {
 
 Assert-FileContains -Path (Join-Path $ApiRepository 'Dockerfile') -Pattern 'dist/server\.js' `
   -Message 'O container da API nao inicia o artefato dist/server.js.'
-Assert-FileContains -Path (Join-Path $ApiRepository 'src/app.ts') -Pattern "app\.get\('/healthz'" `
-  -Message 'A API nao expoe o health check /healthz.'
+Assert-FileContains -Path (Join-Path $ApiRepository 'src/app.ts') -Pattern "app\.get\('/health'" `
+  -Message 'A API nao expoe o health check /health.'
 Assert-FileContains -Path (Join-Path $ApiRepository '.github/workflows/ci.yml') -Pattern 'AUTH_MODE=iap' `
   -Message 'O deploy da API nao fixa AUTH_MODE=iap.'
 Assert-FileContains -Path (Join-Path $ApiRepository '.github/workflows/ci.yml') -Pattern 'ADMIN_ALLOWED_ORIGINS=' `
@@ -110,8 +110,8 @@ Assert-FileContains -Path (Join-Path $ApiRepository '.github/workflows/ci.yml') 
 
 Assert-FileContains -Path (Join-Path $AdminRepository 'Dockerfile') -Pattern '/app/dist/admin/browser/' `
   -Message 'O container do admin nao copia o output Angular esperado.'
-Assert-FileContains -Path (Join-Path $AdminRepository 'deploy/nginx-admin.conf') -Pattern 'location = /healthz' `
-  -Message 'O admin nao expoe o health check /healthz.'
+Assert-FileContains -Path (Join-Path $AdminRepository 'deploy/nginx-admin.conf') -Pattern 'location = /health' `
+  -Message 'O admin nao expoe o health check /health.'
 Assert-FileContains -Path (Join-Path $AdminRepository 'deploy/nginx-admin.conf') `
   -Pattern 'X-Admin-IAP-JWT-Assertion' -Message 'O proxy do admin nao encaminha a assercao do IAP para a API.'
 Assert-FileContains -Path (Join-Path $AdminRepository '.github/workflows/ci.yml') -Pattern '--iap' `
@@ -122,8 +122,8 @@ Assert-FileContains -Path (Join-Path $AdminRepository '.github/workflows/ci.yml'
 Assert-FileContains -Path (Join-Path $siteRepository 'Dockerfile') `
   -Pattern '/app/dist/lucas-camargo-arquitetura/browser/' `
   -Message 'O container do site nao copia o output Angular esperado.'
-Assert-FileContains -Path (Join-Path $siteRepository 'deploy/nginx.conf') -Pattern 'location = /healthz' `
-  -Message 'O site nao expoe o health check /healthz.'
+Assert-FileContains -Path (Join-Path $siteRepository 'deploy/nginx.conf') -Pattern 'location = /health' `
+  -Message 'O site nao expoe o health check /health.'
 Assert-FileContains -Path (Join-Path $siteRepository 'deploy/runtime-config.js.template') `
   -Pattern "contentBaseUrl: '\$\{CONTENT_BASE_URL\}'" `
   -Message 'O runtime config do site nao recebe CONTENT_BASE_URL.'

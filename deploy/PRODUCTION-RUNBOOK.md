@@ -23,7 +23,7 @@ O primeiro comando valida contratos, manifests, outputs, health checks, proteç�
 
 Revise no GitHub o SHA aprovado e execute os workflows dos repositórios nesta ordem:
 
-1. API: confirmar revisão saudável, `/healthz` 204 e `/api/session` 401 sem asserção IAP.
+1. API: confirmar revisão saudável, `/health` 204 e `/api/session` 401 sem asserção IAP.
 2. Admin: confirmar revisão saudável, IAP habilitado e acesso anônimo bloqueado.
 3. Site: o workflow valida primeiro o Worker e só depois publica o site.
 4. Conteúdo: no admin protegido, salvar rascunho com ETag, publicar e confirmar o novo manifest.

@@ -29,7 +29,7 @@ function Get-HeaderValue {
     [string]$Name
   )
 
-  $values = $Response.Headers.GetValues($Name)
+  $values = $Response.Headers[$Name]
 
   if ($null -eq $values) {
     return ''
@@ -49,35 +49,10 @@ function Invoke-SmokeRequest {
 
   try {
     return Invoke-WebRequest -Uri $Uri -Method $Method -Headers $Headers `
-      -MaximumRedirection 5 -TimeoutSec 30 -UseBasicParsing
+      -MaximumRedirection 5 -TimeoutSec 30 -UseBasicParsing -SkipHttpErrorCheck
   }
   catch {
-    $response = $_.Exception.Response
-
-    if ($null -eq $response) {
-      throw
-    }
-
-    $content = ''
-
-    if ($Method -ne 'HEAD') {
-      $stream = $response.GetResponseStream()
-      $reader = New-Object IO.StreamReader($stream)
-
-      try {
-        $content = $reader.ReadToEnd()
-      }
-      finally {
-        $reader.Dispose()
-        $stream.Dispose()
-      }
-    }
-
-    return [PSCustomObject]@{
-      StatusCode = [int]$response.StatusCode
-      Headers = $response.Headers
-      Content = $content
-    }
+    throw
   }
 }
 
@@ -115,7 +90,7 @@ $ContentBaseUrl = $ContentBaseUrl.TrimEnd('/')
 Assert-Condition -Condition ($SiteUrl -match '^https://') -Message 'SiteUrl deve usar HTTPS.'
 Assert-Condition -Condition ($ContentBaseUrl -match '^https://') -Message 'ContentBaseUrl deve usar HTTPS.'
 
-$healthResponse = Invoke-SmokeRequest -Uri "$SiteUrl/healthz"
+$healthResponse = Invoke-SmokeRequest -Uri "$SiteUrl/health"
 Assert-Condition -Condition ($healthResponse.StatusCode -eq 200) `
   -Message "O health check do site retornou $($healthResponse.StatusCode)."
 
@@ -174,8 +149,8 @@ Assert-Condition -Condition ($calculatedSha256 -eq $manifest.sha256) `
 if ($ApiUrl) {
   $ApiUrl = $ApiUrl.TrimEnd('/')
   Assert-Condition -Condition ($ApiUrl -match '^https://') -Message 'ApiUrl deve usar HTTPS.'
-  $apiHealthResponse = Invoke-SmokeRequest -Uri "$ApiUrl/healthz"
-  Assert-Condition -Condition ($apiHealthResponse.StatusCode -eq 204) `
+  $apiHealthResponse = Invoke-SmokeRequest -Uri "$ApiUrl/health"
+Assert-Condition -Condition ($apiHealthResponse.StatusCode -eq 204) `
     -Message "O health check da API retornou $($apiHealthResponse.StatusCode)."
   $sessionResponse = Invoke-SmokeRequest -Uri "$ApiUrl/api/session"
   Assert-Condition -Condition ($sessionResponse.StatusCode -eq 401) `
