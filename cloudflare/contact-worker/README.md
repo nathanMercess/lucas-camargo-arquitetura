@@ -24,6 +24,6 @@ yarn run check
 yarn dev
 ```
 
-Para desenvolvimento local, use as chaves de teste oficiais do Turnstile em `.dev.vars`, que não deve ser versionado. Para produção, cadastre o segredo com `yarn wrangler secret put TURNSTILE_SECRET_KEY` e confirme a conta Cloudflare antes do deploy.
+Para desenvolvimento local, use as chaves de teste oficiais do Turnstile em `.dev.vars`, que não deve ser versionado. Em produção, o workflow lê `TURNSTILE_SECRET_KEY` dos segredos do GitHub, cadastra-o no Worker sem registrá-lo nos logs e injeta a variável pública `TURNSTILE_SITE_KEY` no site.
 
 Referências oficiais: validação server-side do Turnstile, Rate Limiting binding de Workers e API R2 para Workers.
