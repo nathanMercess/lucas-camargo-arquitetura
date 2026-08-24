@@ -51,32 +51,42 @@
   text-transform: uppercase;
 }
 
-:host ::ng-deep .p-galleria-mask {
+.portfolio-gallery-lightbox {
   position: fixed;
   z-index: 1000;
   inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  width: 100%;
+  max-width: none;
+  height: 100%;
+  max-height: none;
+  margin: 0;
   padding: clamp(16px, 3vw, 48px);
+  color: var(--brand-surface);
+  border: 0;
   background: rgb(20 20 19 / 96%);
 }
 
-:host ::ng-deep .p-galleria {
-  width: min(100%, 1500px);
-  color: var(--brand-surface);
+.portfolio-gallery-lightbox::backdrop {
+  background: rgb(20 20 19 / 96%);
 }
 
-:host ::ng-deep .p-galleria-content,
-:host ::ng-deep .p-galleria-items-container,
-:host ::ng-deep .p-galleria-items {
+.portfolio-gallery-lightbox-content {
   position: relative;
+  display: grid;
   width: 100%;
+  max-width: 1500px;
+  height: 100%;
+  margin: 0 auto;
+  grid-template-rows: minmax(0, 1fr) auto;
+  align-items: center;
 }
 
-:host ::ng-deep .p-galleria-item {
+.portfolio-gallery-lightbox-figure {
+  position: relative;
   display: flex;
-  min-height: min(72svh, 900px);
+  min-width: 0;
+  min-height: 0;
+  margin: 0;
   align-items: center;
   justify-content: center;
 }
@@ -89,11 +99,8 @@
   object-fit: contain;
 }
 
-:host ::ng-deep .p-galleria-close-button,
-:host ::ng-deep .p-galleria-prev-button,
-:host ::ng-deep .p-galleria-next-button,
-:host ::ng-deep .p-galleria-thumbnail-prev-button,
-:host ::ng-deep .p-galleria-thumbnail-next-button {
+.portfolio-gallery-close,
+.portfolio-gallery-navigation {
   display: grid;
   width: 44px;
   height: 44px;
@@ -105,55 +112,76 @@
   cursor: pointer;
 }
 
-:host ::ng-deep .p-galleria-close-button {
+.portfolio-gallery-close {
   position: fixed;
   z-index: 2;
   top: 20px;
   right: 20px;
 }
 
-:host ::ng-deep .p-galleria-prev-button,
-:host ::ng-deep .p-galleria-next-button {
+.portfolio-gallery-close span,
+.portfolio-gallery-close span::after {
+  position: absolute;
+  width: 18px;
+  height: 1px;
+  content: '';
+  background: currentcolor;
+  transform: rotate(45deg);
+}
+
+.portfolio-gallery-close span::after {
+  transform: rotate(90deg);
+}
+
+.portfolio-gallery-navigation {
   position: absolute;
   z-index: 1;
   top: 50%;
   transform: translateY(-50%);
 }
 
-:host ::ng-deep .p-galleria-prev-button {
+.portfolio-gallery-navigation span {
+  width: 10px;
+  height: 10px;
+  border-bottom: 1px solid currentcolor;
+  border-left: 1px solid currentcolor;
+  transform: rotate(45deg);
+}
+
+.portfolio-gallery-navigation--previous {
   left: 14px;
 }
 
-:host ::ng-deep .p-galleria-next-button {
+.portfolio-gallery-navigation--next {
   right: 14px;
 }
 
-:host ::ng-deep .p-galleria-thumbnails {
-  padding-top: 16px;
+.portfolio-gallery-navigation--next span {
+  transform: rotate(225deg);
 }
 
-:host ::ng-deep .p-galleria-thumbnails-content,
-:host ::ng-deep .p-galleria-thumbnail-items {
+.portfolio-gallery-thumbnails {
   display: flex;
+  max-width: 100%;
+  padding-top: 16px;
+  overflow-x: auto;
   align-items: center;
-}
-
-:host ::ng-deep .p-galleria-thumbnails-viewport {
-  overflow: hidden;
-  flex: 1;
-}
-
-:host ::ng-deep .p-galleria-thumbnail-items {
   gap: 8px;
+  scrollbar-width: thin;
 }
 
-:host ::ng-deep .p-galleria-thumbnail-item {
+.portfolio-gallery-thumbnail-button {
   flex: 0 0 84px;
+  padding: 0;
   opacity: 0.55;
+  border: 1px solid transparent;
+  background: transparent;
+  cursor: pointer;
 }
 
-:host ::ng-deep .p-galleria-thumbnail-item-current {
+.portfolio-gallery-thumbnail-button[aria-selected='true'] {
   opacity: 1;
+  border-color: var(--brand-surface);
 }
 
 .portfolio-gallery-thumbnail {
@@ -162,17 +190,19 @@
   object-fit: cover;
 }
 
-:host ::ng-deep .p-galleria-caption {
-  padding: 12px 0 0;
-}
-
 .portfolio-gallery-caption {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
   margin: 0;
+  padding: 28px 16px 14px;
   color: rgb(255 255 255 / 72%);
   font-family: var(--font-data);
   font-size: 0.66rem;
   letter-spacing: 0.06em;
   text-transform: uppercase;
+  background: linear-gradient(transparent, rgb(0 0 0 / 68%));
 }
 
 @media (width <= 720px) {
@@ -182,16 +212,24 @@
     grid-column: 1 / -1;
   }
 
-  :host ::ng-deep .p-galleria-mask {
+  .portfolio-gallery-lightbox {
     padding: max(62px, calc(env(safe-area-inset-top) + 52px))
       max(12px, calc(env(safe-area-inset-right) + 8px))
       max(18px, calc(env(safe-area-inset-bottom) + 12px))
       max(12px, calc(env(safe-area-inset-left) + 8px));
   }
 
-  :host ::ng-deep .p-galleria-close-button {
+  .portfolio-gallery-close {
     top: max(12px, env(safe-area-inset-top));
     right: max(12px, env(safe-area-inset-right));
+  }
+
+  .portfolio-gallery-navigation--previous {
+    left: 4px;
+  }
+
+  .portfolio-gallery-navigation--next {
+    right: 4px;
   }
 }
 

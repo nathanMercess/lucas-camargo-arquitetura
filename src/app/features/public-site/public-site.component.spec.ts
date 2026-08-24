@@ -3,7 +3,6 @@ import { HttpTestingController, provideHttpClientTesting } from '@angular/common
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { RouterModule } from '@angular/router';
-import { ButtonModule } from 'primeng/button';
 
 import { ContactSectionComponent } from './components/contact-section/contact-section.component';
 import { HeroSectionComponent } from './components/hero-section/hero-section.component';
@@ -24,7 +23,7 @@ describe('PublicSiteComponent', () => {
     window.localStorage.clear();
 
     await TestBed.configureTestingModule({
-      imports: [ButtonModule, RouterModule.forRoot([])],
+      imports: [RouterModule.forRoot([])],
       declarations: [
         PublicSiteComponent,
         ContactSectionComponent,

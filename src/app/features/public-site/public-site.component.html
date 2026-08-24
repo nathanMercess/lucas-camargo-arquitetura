@@ -80,7 +80,8 @@
               <img [src]="contentService.resolveMediaPath(section.portrait.assetId)"
                 [alt]="section.portrait.decorative ? '' : section.portrait.alt"
                 [attr.aria-hidden]="section.portrait.decorative"
-                [style.object-position]="section.portrait.focalPointX + '% ' + section.portrait.focalPointY + '%'" />
+                [style.object-position]="section.portrait.focalPointX + '% ' + section.portrait.focalPointY + '%'"
+                loading="lazy" decoding="async" />
               @if (section.portrait.caption; as caption) {
                 <span>{{ caption }}</span>
               }

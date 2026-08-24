@@ -69,39 +69,41 @@ export class ConfigurablePageComponent {
     () => this.sections().find((section) => section.type !== 'hero')?.anchor ?? 'conteudo',
   );
 
-  private readonly synchronizeSeo = effect(() => {
-    this.contentService.isLoading();
+  public constructor() {
+    effect(() => {
+      this.contentService.isLoading();
 
-    const page = this.resolvedPage();
+      const page = this.resolvedPage();
 
-    if (page) {
+      if (page) {
+        this.contentService.applyPageSeo(
+          page.seo,
+          this.contentService.config().seo.openGraph.imageAlt,
+          'website',
+        );
+        return;
+      }
+
+      if (this.contentService.isLoading())
+        return;
+
+      const config = this.contentService.config();
+      const pageSlug = this.routeParamMap().get('pageSlug') ?? '';
+      const unavailableSeo: PageSeo = {
+        title: config.seo.title,
+        description: config.seo.description,
+        canonicalPath: pageSlug ? `/${pageSlug}` : '/',
+        imageMediaId: config.seo.openGraph.imageMediaId,
+        noIndex: true,
+      };
+
       this.contentService.applyPageSeo(
-        page.seo,
-        this.contentService.config().seo.openGraph.imageAlt,
+        unavailableSeo,
+        config.seo.openGraph.imageAlt,
         'website',
       );
-      return;
-    }
-
-    if (this.contentService.isLoading())
-      return;
-
-    const config = this.contentService.config();
-    const pageSlug = this.routeParamMap().get('pageSlug') ?? '';
-    const unavailableSeo: PageSeo = {
-      title: config.seo.title,
-      description: config.seo.description,
-      canonicalPath: pageSlug ? `/${pageSlug}` : '/',
-      imageMediaId: config.seo.openGraph.imageMediaId,
-      noIndex: true,
-    };
-
-    this.contentService.applyPageSeo(
-      unavailableSeo,
-      config.seo.openGraph.imageAlt,
-      'website',
-    );
-  });
+    });
+  }
 
   public projectsFor(projectIds: readonly string[]): readonly PortfolioProject[] {
     const projectsById = new Map(

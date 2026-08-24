@@ -77,7 +77,7 @@
       </div>
     }
 
-    <button pButton class="contact-form-submit" type="submit" [disabled]="form.invalid || !canSubmit()">
+    <button class="contact-form-submit" type="submit" [disabled]="form.invalid || !canSubmit()">
       @if (isSubmitting()) {
         <span i18n>Enviando...</span>
       } @else {

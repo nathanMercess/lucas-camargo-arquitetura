@@ -1,5 +1,4 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { ButtonModule } from 'primeng/button';
 
 import { DEFAULT_SITE_CONFIG } from '../../../../shared/config/default-site-config';
 import { RichTextComponent } from '../rich-text/rich-text.component';
@@ -16,7 +15,6 @@ describe('HeroSectionComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ButtonModule],
       declarations: [HeroSectionComponent, RichTextComponent, SiteHeaderComponent],
     }).compileComponents();
 

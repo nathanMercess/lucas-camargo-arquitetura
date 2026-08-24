@@ -1,8 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
-import { ButtonModule } from 'primeng/button';
-import { GalleriaModule } from 'primeng/galleria';
 
 import { ConfigurablePageComponent } from './components/configurable-page/configurable-page.component';
 import { ContactFormSectionComponent } from './components/contact-form-section/contact-form-section.component';
@@ -28,7 +26,7 @@ import { PublicSiteRoutingModule } from './public-site-routing.module';
 import { PublicSiteComponent } from './public-site.component';
 
 @NgModule({
-  imports: [CommonModule, ReactiveFormsModule, ButtonModule, GalleriaModule, PublicSiteRoutingModule],
+  imports: [CommonModule, ReactiveFormsModule, PublicSiteRoutingModule],
   declarations: [
     ConfigurablePageComponent,
     ContactFormSectionComponent,

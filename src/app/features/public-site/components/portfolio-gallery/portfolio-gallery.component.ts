@@ -1,5 +1,12 @@
-import { ChangeDetectionStrategy, Component, computed, input, signal } from '@angular/core';
-import { GalleriaResponsiveOptions } from 'primeng/galleria';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  ElementRef,
+  computed,
+  input,
+  signal,
+  viewChild,
+} from '@angular/core';
 
 import { MediaAsset } from '../../../../shared/models/media-asset.model';
 import { MediaReference } from '../../../../shared/models/media-reference.model';
@@ -25,11 +32,7 @@ export class PortfolioGalleryComponent {
 
   public readonly activeIndex = signal<number>(0);
 
-  public readonly responsiveOptions: GalleriaResponsiveOptions[] = [
-    { breakpoint: '1024px', numVisible: 5 },
-    { breakpoint: '720px', numVisible: 3 },
-    { breakpoint: '480px', numVisible: 1 },
-  ];
+  private readonly lightbox = viewChild<ElementRef<HTMLDialogElement>>('lightbox');
 
   public readonly galleryItems = computed<PortfolioGalleryItem[]>(() => {
     const assetsById = new Map(this.mediaAssets().map((asset) => [asset.id, asset]));
@@ -57,20 +60,59 @@ export class PortfolioGalleryComponent {
     });
   });
 
+  public readonly activeItem = computed(() => this.galleryItems()[this.activeIndex()]);
+
   public openLightbox(position: number): void {
     if (!this.galleryItems()[position])
       return;
 
     this.activeIndex.set(position);
     this.isLightboxVisible.set(true);
+
+    const dialog = this.lightbox()?.nativeElement;
+
+    if (!dialog || dialog.open || typeof dialog.showModal !== 'function')
+      return;
+
+    dialog.showModal();
   }
 
   public setActiveIndex(position: number): void {
+    if (!this.galleryItems()[position])
+      return;
+
     this.activeIndex.set(position);
   }
 
-  public setLightboxVisibility(isVisible: boolean): void {
-    this.isLightboxVisible.set(isVisible);
+  public showPrevious(): void {
+    const itemCount = this.galleryItems().length;
+
+    if (itemCount < 2)
+      return;
+
+    this.activeIndex.update((position) => (position - 1 + itemCount) % itemCount);
+  }
+
+  public showNext(): void {
+    const itemCount = this.galleryItems().length;
+
+    if (itemCount < 2)
+      return;
+
+    this.activeIndex.update((position) => (position + 1) % itemCount);
+  }
+
+  public closeLightbox(): void {
+    const dialog = this.lightbox()?.nativeElement;
+
+    if (dialog?.open && typeof dialog.close === 'function')
+      dialog.close();
+
+    this.isLightboxVisible.set(false);
+  }
+
+  public handleDialogClose(): void {
+    this.isLightboxVisible.set(false);
   }
 
   public lightboxLabel(item: PortfolioGalleryItem, position: number): string {

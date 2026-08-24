@@ -11,7 +11,8 @@
   <img class="hero-section-image" [src]="backgroundPath()"
     [alt]="config().background.decorative ? '' : config().background.alt"
     [attr.aria-hidden]="config().background.decorative"
-    [style.object-position]="config().background.focalPointX + '% ' + config().background.focalPointY + '%'" />
+    [style.object-position]="config().background.focalPointX + '% ' + config().background.focalPointY + '%'"
+    fetchpriority="high" decoding="async" />
   <div class="hero-section-scrim" aria-hidden="true"></div>
 
   <div class="hero-section-content">

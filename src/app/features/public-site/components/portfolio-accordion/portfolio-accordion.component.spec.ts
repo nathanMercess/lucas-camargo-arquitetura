@@ -1,6 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { RouterModule } from '@angular/router';
-import { ButtonModule } from 'primeng/button';
 
 import { DEFAULT_SITE_CONFIG } from '../../../../shared/config/default-site-config';
 import { PortfolioCategory } from '../../../../shared/models/portfolio-category.model';
@@ -36,7 +35,7 @@ describe('PortfolioAccordionComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ButtonModule, RouterModule.forRoot([])],
+      imports: [RouterModule.forRoot([])],
       declarations: [PortfolioAccordionComponent],
     }).compileComponents();
 

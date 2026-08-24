@@ -70,33 +70,35 @@ export class PortfolioDetailComponent {
     ),
   );
 
-  private readonly synchronizeSeo = effect(() => {
-    this.contentService.isLoading();
+  public constructor() {
+    effect(() => {
+      this.contentService.isLoading();
 
-    const config = this.contentService.config();
-    const project = this.project();
+      const config = this.contentService.config();
+      const project = this.project();
 
-    if (project) {
+      if (project) {
+        this.contentService.applyPageSeo(
+          project.seo,
+          project.cover.alt || project.title,
+          'article',
+        );
+        return;
+      }
+
+      const unavailableSeo: PageSeo = {
+        title: config.seo.title,
+        description: config.seo.description,
+        canonicalPath: `/portfolio/projeto/${encodeURIComponent(this.slug())}`,
+        imageMediaId: config.seo.openGraph.imageMediaId,
+        noIndex: true,
+      };
+
       this.contentService.applyPageSeo(
-        project.seo,
-        project.cover.alt || project.title,
-        'article',
+        unavailableSeo,
+        config.seo.openGraph.imageAlt,
+        'website',
       );
-      return;
-    }
-
-    const unavailableSeo: PageSeo = {
-      title: config.seo.title,
-      description: config.seo.description,
-      canonicalPath: `/portfolio/projeto/${encodeURIComponent(this.slug())}`,
-      imageMediaId: config.seo.openGraph.imageMediaId,
-      noIndex: true,
-    };
-
-    this.contentService.applyPageSeo(
-      unavailableSeo,
-      config.seo.openGraph.imageAlt,
-      'website',
-    );
-  });
+    });
+  }
 }

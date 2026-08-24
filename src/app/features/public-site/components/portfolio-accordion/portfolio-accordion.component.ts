@@ -47,34 +47,36 @@ export class PortfolioAccordionComponent {
 
   private readonly isPointerInteractionPaused = signal<boolean>(false);
 
-  private readonly synchronizeActiveCategory = effect(() => {
-    const categories = this.visibleCategories();
+  public constructor() {
+    effect(() => {
+      const categories = this.visibleCategories();
 
-    if (categories.some((category) => category.id === this.activeCategoryId()))
-      return;
+      if (categories.some((category) => category.id === this.activeCategoryId()))
+        return;
 
-    this.activeCategoryId.set(categories[0]?.id ?? '');
-  });
+      this.activeCategoryId.set(categories[0]?.id ?? '');
+    });
 
-  private readonly rotateCategories = effect((onCleanup) => {
-    const config = this.config();
-    const browserWindow = this.document.defaultView;
+    effect((onCleanup) => {
+      const config = this.config();
+      const browserWindow = this.document.defaultView;
 
-    if (!browserWindow || !config.autoRotationEnabled)
-      return;
+      if (!browserWindow || !config.autoRotationEnabled)
+        return;
 
-    if (this.prefersReducedMotion()) {
-      this.isAutoRotationPaused.set(true);
-      return;
-    }
+      if (this.prefersReducedMotion()) {
+        this.isAutoRotationPaused.set(true);
+        return;
+      }
 
-    const intervalId = browserWindow.setInterval(
-      () => this.selectNextCategory(),
-      config.autoRotationIntervalMs,
-    );
+      const intervalId = browserWindow.setInterval(
+        () => this.selectNextCategory(),
+        config.autoRotationIntervalMs,
+      );
 
-    onCleanup(() => browserWindow.clearInterval(intervalId));
-  });
+      onCleanup(() => browserWindow.clearInterval(intervalId));
+    });
+  }
 
   public selectCategory(categoryId: string): void {
     const categoryExists = this.visibleCategories().some(

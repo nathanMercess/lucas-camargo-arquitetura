@@ -1,6 +1,4 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { ButtonModule } from 'primeng/button';
-import { GalleriaModule } from 'primeng/galleria';
 
 import { DEFAULT_SITE_CONFIG } from '../../../../shared/config/default-site-config';
 import { MediaReference } from '../../../../shared/models/media-reference.model';
@@ -21,7 +19,6 @@ describe('PortfolioGalleryComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ButtonModule, GalleriaModule],
       declarations: [PortfolioGalleryComponent],
     }).compileComponents();
 
@@ -52,7 +49,7 @@ describe('PortfolioGalleryComponent', () => {
     ]);
   });
 
-  it('should open the PrimeNG lightbox at the selected item', () => {
+  it('should open the native lightbox at the selected item', () => {
     component.openLightbox(0);
 
     expect(component.activeIndex()).toBe(0);
@@ -63,5 +60,18 @@ describe('PortfolioGalleryComponent', () => {
     component.openLightbox(8);
 
     expect(component.isLightboxVisible()).toBe(false);
+  });
+
+  it('should navigate through lightbox items circularly', () => {
+    fixture.componentRef.setInput('references', [reference, reference]);
+    fixture.detectChanges();
+
+    component.showPrevious();
+
+    expect(component.activeIndex()).toBe(1);
+
+    component.showNext();
+
+    expect(component.activeIndex()).toBe(0);
   });
 });

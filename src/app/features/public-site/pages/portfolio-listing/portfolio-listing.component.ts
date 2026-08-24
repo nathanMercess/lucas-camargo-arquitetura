@@ -78,53 +78,55 @@ export class PortfolioListingComponent {
     ),
   );
 
-  private readonly synchronizeSeo = effect(() => {
-    this.contentService.isLoading();
+  public constructor() {
+    effect(() => {
+      this.contentService.isLoading();
 
-    const config = this.contentService.config();
-    const section = this.section();
-    const category = this.selectedCategory();
-    const categoryId = this.categoryId();
-    const defaultImageMediaId = config.seo.openGraph.imageMediaId;
-    const canonicalPath = categoryId ? `/portfolio/categoria/${categoryId}` : '/portfolio';
+      const config = this.contentService.config();
+      const section = this.section();
+      const category = this.selectedCategory();
+      const categoryId = this.categoryId();
+      const defaultImageMediaId = config.seo.openGraph.imageMediaId;
+      const canonicalPath = categoryId ? `/portfolio/categoria/${categoryId}` : '/portfolio';
 
-    if (!section || (categoryId && !category)) {
-      const unavailableSeo: PageSeo = {
-        title: config.seo.title,
-        description: config.seo.description,
+      if (!section || (categoryId && !category)) {
+        const unavailableSeo: PageSeo = {
+          title: config.seo.title,
+          description: config.seo.description,
+          canonicalPath,
+          imageMediaId: defaultImageMediaId,
+          noIndex: true,
+        };
+
+        this.contentService.applyPageSeo(
+          unavailableSeo,
+          config.seo.openGraph.imageAlt,
+          'website',
+        );
+        return;
+      }
+
+      const pageTitle = category?.title ?? this.toPlainText(section.title);
+      const pageDescription = category?.description ?? section.description.join(' ');
+      const imageMediaId =
+        category?.coverMediaId ??
+        this.categories().find((item) => item.coverMediaId)?.coverMediaId ??
+        defaultImageMediaId;
+      const pageSeo: PageSeo = {
+        title: `${pageTitle} | ${config.identity.brandName}`,
+        description: pageDescription,
         canonicalPath,
-        imageMediaId: defaultImageMediaId,
-        noIndex: true,
+        imageMediaId,
+        noIndex: false,
       };
 
       this.contentService.applyPageSeo(
-        unavailableSeo,
-        config.seo.openGraph.imageAlt,
+        pageSeo,
+        category?.title ?? config.seo.openGraph.imageAlt,
         'website',
       );
-      return;
-    }
-
-    const pageTitle = category?.title ?? this.toPlainText(section.title);
-    const pageDescription = category?.description ?? section.description.join(' ');
-    const imageMediaId =
-      category?.coverMediaId ??
-      this.categories().find((item) => item.coverMediaId)?.coverMediaId ??
-      defaultImageMediaId;
-    const pageSeo: PageSeo = {
-      title: `${pageTitle} | ${config.identity.brandName}`,
-      description: pageDescription,
-      canonicalPath,
-      imageMediaId,
-      noIndex: false,
-    };
-
-    this.contentService.applyPageSeo(
-      pageSeo,
-      category?.title ?? config.seo.openGraph.imageAlt,
-      'website',
-    );
-  });
+    });
+  }
 
   private toPlainText(content: RichTextBlock): string {
     return content.lines

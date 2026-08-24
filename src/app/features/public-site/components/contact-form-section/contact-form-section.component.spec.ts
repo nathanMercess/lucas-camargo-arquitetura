@@ -1,7 +1,6 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { TestBed } from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
-import { ButtonModule } from 'primeng/button';
 import { of, throwError } from 'rxjs';
 
 import { ContactFormSectionConfig } from '../../../../shared/models/contact-form-section-config.model';
@@ -57,7 +56,7 @@ describe('ContactFormSectionComponent', () => {
     turnstile.remove.mockClear();
 
     await TestBed.configureTestingModule({
-      imports: [ReactiveFormsModule, ButtonModule],
+      imports: [ReactiveFormsModule],
       declarations: [
         ContactFormSectionComponent,
         RichTextComponent,

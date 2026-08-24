@@ -2,7 +2,7 @@
   (mouseleave)="setPointerInteractionPaused(false)" (focusin)="setPointerInteractionPaused(true)"
   (focusout)="setPointerInteractionPaused(false)">
   @for (category of visibleCategories(); track category.id) {
-    <a pButton class="portfolio-accordion-panel" [class]="category.visualClass"
+    <a class="portfolio-accordion-panel" [class]="category.visualClass"
       [style.background-image]="backgroundImage(category)"
       [class.portfolio-accordion-panel--active]="activeCategoryId() === category.id"
       [attr.aria-current]="activeCategoryId() === category.id ? 'true' : null" [attr.aria-label]="category.title"
@@ -24,7 +24,7 @@
   }
 
   @if (config().autoRotationEnabled) {
-    <button pButton class="portfolio-accordion-motion-control" type="button"
+    <button class="portfolio-accordion-motion-control" type="button"
       [attr.aria-label]="motionControlLabel()" (click)="toggleAutoRotation()">
       <span>{{ motionControlText() }}</span>
     </button>

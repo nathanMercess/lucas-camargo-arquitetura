@@ -2,10 +2,11 @@
   <a class="site-header-logo-link" [href]="config().homeLink.href"
     [attr.aria-label]="config().homeLink.ariaLabel ?? config().homeLink.label"
     [attr.target]="config().homeLink.target ?? '_self'" (click)="closeMenu()">
-    <img class="site-header-logo" [src]="logoPath()" [alt]="config().logo.alt" />
+    <img class="site-header-logo" [src]="logoPath()" [alt]="config().logo.alt" width="1090" height="256"
+      decoding="async" />
   </a>
 
-  <button #menuButton pButton class="site-header-menu-button" type="button" aria-controls="site-navigation"
+  <button #menuButton class="site-header-menu-button" type="button" aria-controls="site-navigation"
     [attr.aria-expanded]="isMenuOpen()"
     [attr.aria-label]="isMenuOpen() ? uiLabels().closeMenu : uiLabels().openMenu"
     (click)="toggleMenu()">

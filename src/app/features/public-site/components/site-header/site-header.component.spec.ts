@@ -1,5 +1,4 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { ButtonModule } from 'primeng/button';
 
 import { DEFAULT_SITE_CONFIG } from '../../../../shared/config/default-site-config';
 import { SiteHeaderComponent } from './site-header.component';
@@ -10,7 +9,6 @@ describe('SiteHeaderComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ButtonModule],
       declarations: [SiteHeaderComponent],
     }).compileComponents();
 
