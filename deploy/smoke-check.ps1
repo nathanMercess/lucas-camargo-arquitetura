@@ -152,9 +152,9 @@ if ($ApiUrl) {
   $apiHealthResponse = Invoke-SmokeRequest -Uri "$ApiUrl/health"
 Assert-Condition -Condition ($apiHealthResponse.StatusCode -eq 204) `
     -Message "O health check da API retornou $($apiHealthResponse.StatusCode)."
-  $sessionResponse = Invoke-SmokeRequest -Uri "$ApiUrl/api/session"
+  $sessionResponse = Invoke-SmokeRequest -Uri "$ApiUrl/api/v1/session"
   Assert-Condition -Condition ($sessionResponse.StatusCode -eq 401) `
-    -Message "A API aceitou uma sessao sem IAP ou retornou estado inesperado: $($sessionResponse.StatusCode)."
+    -Message "A API aceitou uma requisicao sem sessao administrativa ou retornou estado inesperado: $($sessionResponse.StatusCode)."
 }
 
 Write-Host 'Smoke check concluido: site, runtime config, manifest, ETag, release e SHA-256 validos.'

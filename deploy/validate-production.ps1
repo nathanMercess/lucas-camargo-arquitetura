@@ -99,8 +99,11 @@ Assert-FileContains -Path (Join-Path $ApiRepository 'Dockerfile') -Pattern 'dist
   -Message 'O container da API nao inicia o artefato dist/server.js.'
 Assert-FileContains -Path (Join-Path $ApiRepository 'src/app.ts') -Pattern "app\.get\('/health'" `
   -Message 'A API nao expoe o health check /health.'
-Assert-FileContains -Path (Join-Path $ApiRepository '.github/workflows/ci.yml') -Pattern 'AUTH_MODE=iap' `
-  -Message 'O deploy da API nao fixa AUTH_MODE=iap.'
+Assert-FileContains -Path (Join-Path $ApiRepository '.github/workflows/ci.yml') -Pattern 'AUTH_MODE=credentials' `
+  -Message 'O deploy da API nao fixa AUTH_MODE=credentials.'
+Assert-FileContains -Path (Join-Path $ApiRepository '.github/workflows/ci.yml') `
+  -Pattern 'ADMIN_CREDENTIALS_JSON=lucas-admin-credentials:latest' `
+  -Message 'O deploy da API nao injeta o segredo de credenciais administrativas.'
 Assert-FileContains -Path (Join-Path $ApiRepository '.github/workflows/ci.yml') -Pattern 'ADMIN_ALLOWED_ORIGINS=' `
   -Message 'O deploy da API nao configura a origem exata do admin.'
 Assert-FileContains -Path (Join-Path $ApiRepository '.github/workflows/ci.yml') -Pattern 'R2_PRIVATE_BUCKET=' `
@@ -112,12 +115,10 @@ Assert-FileContains -Path (Join-Path $AdminRepository 'Dockerfile') -Pattern '/a
   -Message 'O container do admin nao copia o output Angular esperado.'
 Assert-FileContains -Path (Join-Path $AdminRepository 'deploy/nginx-admin.conf') -Pattern 'location = /health' `
   -Message 'O admin nao expoe o health check /health.'
-Assert-FileContains -Path (Join-Path $AdminRepository 'deploy/nginx-admin.conf') `
-  -Pattern 'X-Admin-IAP-JWT-Assertion' -Message 'O proxy do admin nao encaminha a assercao do IAP para a API.'
-Assert-FileContains -Path (Join-Path $AdminRepository '.github/workflows/ci.yml') -Pattern '--iap' `
-  -Message 'O deploy do admin nao habilita IAP.'
-Assert-FileContains -Path (Join-Path $AdminRepository '.github/workflows/ci.yml') -Pattern '--no-allow-unauthenticated' `
-  -Message 'O deploy do admin permite acesso anonimo.'
+Assert-FileContains -Path (Join-Path $AdminRepository '.github/workflows/ci.yml') -Pattern '--no-iap' `
+  -Message 'O deploy do admin nao desabilita o IAP temporariamente.'
+Assert-FileContains -Path (Join-Path $AdminRepository '.github/workflows/ci.yml') -Pattern '--allow-unauthenticated' `
+  -Message 'O deploy do admin nao libera a pagina publica de login.'
 
 Assert-FileContains -Path (Join-Path $siteRepository 'Dockerfile') `
   -Pattern '/app/dist/lucas-camargo-arquitetura/browser/' `

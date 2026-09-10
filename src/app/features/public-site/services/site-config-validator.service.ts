@@ -224,7 +224,10 @@ export class SiteConfigValidatorService {
       value === 'lucas-camargo-v1' ||
       value === 'gallery-v1' ||
       value === 'minimal-v1' ||
-      value === 'contrast-v1'
+      value === 'contrast-v1' ||
+      value === 'essential-narrative-v1' ||
+      value === 'services-journey-v1' ||
+      value === 'studio-profile-v1'
     );
   }
 
