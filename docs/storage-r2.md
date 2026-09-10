@@ -6,7 +6,7 @@ O site não precisa de banco de dados para o conteúdo editorial. A solução pr
 
 ```text
 Visitante -> Angular público -> Worker somente leitura -> lucas-camargo-published
-Administrador -> Cloud Run Admin protegido por IAP -> buckets private e published
+Administrador -> login no Cloud Run Admin -> sessão validada pela API -> buckets private e published
 ```
 
 Nenhuma chave S3/R2 pode existir no Angular, no repositório ou em variáveis entregues ao navegador.
@@ -30,7 +30,7 @@ lucas-camargo-published
 - O Worker público aceita apenas `GET` e `HEAD`, não lista objetos e restringe CORS ao domínio do site.
 - O backend administrativo recebe um token de leitura e escrita limitado aos dois buckets.
 - O Worker recebe acesso somente de leitura ao bucket publicado.
-- Segredos do backend ficam no Google Secret Manager, nunca em arquivos JSON locais.
+- Segredos do backend, incluindo o JSON temporário de credenciais administrativas, ficam no Google Secret Manager e nunca chegam ao Angular ou ao Git.
 
 ## Versionamento e publicação
 

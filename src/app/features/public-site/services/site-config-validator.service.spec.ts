@@ -19,6 +19,19 @@ describe('SiteConfigValidatorService', () => {
     expect(service.isSiteDocument(config)).toBe(true);
   });
 
+  it.each([
+    'essential-narrative-v1',
+    'services-journey-v1',
+    'studio-profile-v1',
+  ] as const)('should accept the new %s visual format', (presetId) => {
+    const config = createSiteConfigV2Fixture();
+
+    expect(service.isSiteConfigV2({
+      ...config,
+      theme: { ...config.theme, presetId },
+    })).toBe(true);
+  });
+
   it('should reject V2 documents that retain removed V1 rendering fields', () => {
     const config = createSiteConfigV2Fixture();
 
